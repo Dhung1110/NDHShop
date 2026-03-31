@@ -10,6 +10,6 @@ namespace SV22T1020146.Shop.Models
 
         // Hoặc thông tin chi tiết để theo dõi trạng thái (Chức năng 9)
         public Order? CurrentOrder { get; set; }
-        public List<OrderDetail> OrderDetails { get; set; } = new List<OrderDetail>();
+        public List<OrderDetailViewInfo> OrderDetails { get; set; } = new List<OrderDetailViewInfo>();
     }
 }

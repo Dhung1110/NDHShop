@@ -303,30 +303,43 @@ namespace SV22T1020146.Admin.Controllers
         [HttpPost]
         public async Task<IActionResult> SavePhoto(ProductPhoto data, IFormFile? uploadPhoto)
         {
-            if (string.IsNullOrWhiteSpace(data.Description)) data.Description = "";
+            // Nếu mô tả trống thì set rỗng
+            if (string.IsNullOrWhiteSpace(data.Description))
+                data.Description = "";
 
             // Xử lý upload ảnh
             if (uploadPhoto != null)
             {
                 var fileName = $"{Guid.NewGuid()}{Path.GetExtension(uploadPhoto.FileName)}";
                 var path = Path.Combine(ApplicationContext.WWWRootPath, "images/products", fileName);
+
                 using (var stream = new FileStream(path, FileMode.Create))
                 {
                     await uploadPhoto.CopyToAsync(stream);
                 }
+
                 data.Photo = fileName;
             }
 
+            // Nếu không có ảnh nào => báo lỗi
             if (string.IsNullOrEmpty(data.Photo))
+            {
                 ModelState.AddModelError(nameof(data.Photo), "Vui lòng chọn ảnh");
+            }
 
-            if (!ModelState.IsValid) return View("EditPhoto", data);
+            // Nếu có lỗi => trả về lại form
+            if (!ModelState.IsValid)
+            {
+                return View("EditPhoto", data);
+            }
 
+            // Thêm hoặc cập nhật ảnh
             if (data.PhotoID == 0)
                 await CatalogDataService.AddPhotoAsync(data);
             else
                 await CatalogDataService.UpdatePhotoAsync(data);
 
+            // Luôn redirect về trang Edit sản phẩm
             return RedirectToAction("Edit", new { id = data.ProductID });
         }
 

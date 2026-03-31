@@ -9,79 +9,100 @@
 <div class="container py-5">
     <div class="product-detail-container">
         <div class="mb-4">
-            <a href="@Url.Action("Index", "Product")" class="text-decoration-none text-muted fw-bold small text-uppercase">
-                <i class="fa-solid fa-arrow-left me-1"></i> Quay lại cửa hàng
+            <a href="@Url.Action("Index", "Product")" class="back-link">
+                <i class="fa-solid fa-chevron-left me-2"></i> Quay lại cửa hàng
             </a>
         </div>
 
         <div class="row g-5">
             <div class="col-lg-6">
-                <div class="main-img-wrapper">
-                    @if (photos != null && photos.Count > 0)
+                <div class="main-img-wrapper mb-3">
+                    @if (!string.IsNullOrWhiteSpace(Model.Photo))
                     {
-                        <img id="mainImg" src="@photos[0].Photo" alt="@Model.ProductName" />
+                        <img id="mainImg" src="@Url.Content("~/images/products/" + Model.Photo)" alt="@Model.ProductName" />
                     }
                     else
                     {
-                        <img id="mainImg" src="~/images/no-image.png" alt="No image" />
+                        <img id="mainImg" src="@Url.Content("~/images/no-image.png")" alt="No image" />
                     }
                 </div>
 
-                @if (photos != null && photos.Count > 1)
+                @if (photos != null && photos.Count > 0)
                 {
-                    <div class="d-flex gap-2 flex-wrap">
+                    <div class="d-flex gap-2 flex-wrap justify-content-center">
+                        <img src="@Url.Content("~/images/products/" + Model.Photo)"
+                             class="thumb-img border active"
+                             onclick="changeImage(this)" />
+
                         @foreach (var p in photos)
                         {
-                            <img src="@p.Photo"
+                            <img src="@Url.Content("~/images/products/" + p.Photo)"
                                  class="thumb-img border"
                                  onclick="changeImage(this)" />
                         }
                     </div>
                 }
-            </div>
-
-            <div class="col-lg-6">
+            </div> <div class="col-lg-6">
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb mb-2">
-                        <li class="breadcrumb-item"><a href="/" class="text-decoration-none">Trang chủ</a></li>
-                        <li class="breadcrumb-item active">Chi tiết</li>
+                        
+                        <li class="breadcrumb-item active">@Model.ProductName</li>
                     </ol>
                 </nav>
 
                 <h1 class="product-name">@Model.ProductName</h1>
 
-                <div class="price-tag">@Model.Price.ToString("N0") đ</div>
-
-                <div class="product-meta mt-2">
-                    <p class="mb-2"><span class="info-label">Đơn vị:</span> <span class="badge bg-light text-dark border">@Model.Unit</span></p>
-                    <p class="mb-4">
-                        <span class="info-label">Trạng thái:</span>
-                        @if (Model.IsSelling)
-                        {
-                            <span class="text-success fw-bold"><i class="fa-solid fa-circle-check me-1"></i> Đang bán</span>
-                        }
-                        else
-                        {
-                            <span class="text-danger fw-bold"><i class="fa-solid fa-circle-xmark me-1"></i> Ngừng bán</span>
-                        }
-                    </p>
+                <div class="price-section">
+                    <span class="price-tag">@Model.Price.ToString("N0") <small>đ</small></span>
+                    @if (Model.IsSelling)
+                    {
+                        <span class="badge bg-success-subtle text-success ms-2 p-2">
+                            <i class="fa-solid fa-check-double me-1"></i> Sẵn sàng giao
+                        </span>
+                    }
                 </div>
 
-                <div class="action-buttons d-flex gap-3 mt-4">
-                    <button class="btn btn-buy btn-lg"
-                            onclick="addToCart(@Model.ProductID)">
-                        <i class="fa-solid fa-cart-plus me-2"></i> THÊM VÀO GIỎ HÀNG
-                    </button>
-                    <button class="btn btn-outline-secondary btn-lg rounded-4 px-4">
+                <div class="product-info-grid mt-4">
+                    <div class="info-item">
+                        <span class="info-label">Đơn vị tính</span>
+                        <span class="info-value">@Model.Unit</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Trạng thái</span>
+                        <span class="info-value">
+                            @(Model.IsSelling ? "Đang bán" : "Hết hàng")
+                        </span>
+                    </div>
+                </div>
+
+                <div class="action-buttons d-flex gap-3 mt-5">
+                    @if (Model.IsSelling)
+                    {
+                        <button class="btn btn-buy btn-lg"
+                                onclick="addToCart(@Model.ProductID)">
+                            <i class="fa-solid fa-cart-plus me-2"></i> THÊM VÀO GIỎ HÀNG
+                        </button>
+                    }
+                    else
+                    {
+                        <button class="btn btn-buy btn-lg" disabled>
+                            <i class="fa-solid fa-cart-plus me-2"></i> HẾT HÀNG
+                        </button>
+                    }
+                    <button class="btn btn-wishlist">
                         <i class="fa-regular fa-heart"></i>
                     </button>
                 </div>
 
-                <div class="mt-4 p-3 border rounded-4 bg-light d-flex align-items-center gap-3">
-                    <i class="fa-solid fa-truck-fast text-primary fs-3"></i>
-                    <div>
-                        <span class="d-block fw-bold small">Giao hàng miễn phí</span>
-                        <span class="text-muted small">Cho đơn hàng trên 500.000đ tại TP. Huế</span>
+                <div class="shipping-card mt-4">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="icon-box">
+                            <i class="fa-solid fa-truck-fast"></i>
+                        </div>
+                        <div>
+                            <p class="mb-0 fw-bold">Giao hàng siêu tốc</p>
+                            <p class="mb-0 text-muted small">Miễn phí cho đơn hàng từ 500k tại Huế</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -90,15 +111,17 @@
         @if (attributes != null && attributes.Count > 0)
         {
             <div class="mt-5 pt-5 border-top">
-                <h4 class="fw-bold mb-4"><i class="fa-solid fa-list-ul me-2 text-primary"></i>Thông số sản phẩm</h4>
-                <div class="table-responsive">
-                    <table class="table table-hover spec-table">
+                <h4 class="section-title mb-4">
+                    <span>Thông số sản phẩm</span>
+                </h4>
+                <div class="table-responsive shadow-sm rounded-4 overflow-hidden">
+                    <table class="table table-striped table-hover mb-0">
                         <tbody>
                             @foreach (var a in attributes)
                             {
                                 <tr>
-                                    <th style="width: 30%;" class="ps-4 py-3">@a.AttributeName</th>
-                                    <td class="ps-4 py-3 text-dark">@a.AttributeValue</td>
+                                    <th style="width: 30%;" class="bg-light ps-4 py-3 text-secondary">@a.AttributeName</th>
+                                    <td class="ps-4 py-3 fw-medium">@a.AttributeValue</td>
                                 </tr>
                             }
                         </tbody>
@@ -108,72 +131,81 @@
         }
     </div>
 </div>
-@section Scripts{
-<script>
-    function changeImage(element) {
-        // Thay đổi ảnh chính
-        document.getElementById('mainImg').src = element.src;
 
-        // Cập nhật class active cho border
-        var thumbnails = document.querySelectorAll('.thumb-img');
-        thumbnails.forEach(img => img.classList.remove('active'));
-        element.classList.add('active');
-    }
-    function addToCart(productId) {
-        fetch(`/Cart/AddToCart?productId=${productId}&quantity=1`)
-            .then(res => {
-                if (res.ok) {
-                    alert("✅ Đã thêm vào giỏ hàng");
-                    updateCartCount();
-                } else {
-                    alert("❌ Lỗi thêm giỏ hàng");
-                }
-            });
-    }
-
-    function updateCartCount() {
-        fetch('/Cart/GetCount')
-            .then(res => res.text())
-            .then(count => {
-                let badge = document.getElementById("cart-count");
-                if (badge) badge.innerText = count;
-            });
-    }
-</script>
-}
-@section Styles{
-    <style>
-        /* Tổng thể */
-        .product-detail-container {
-            background: #fff;
-            border-radius: 24px;
-            padding: 40px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.03);
+@section Scripts {
+    <script>
+        function changeImage(element) {
+            document.getElementById('mainImg').src = element.src;
+            var thumbnails = document.querySelectorAll('.thumb-img');
+            thumbnails.forEach(img => img.classList.remove('active'));
+            element.classList.add('active');
         }
 
-        /* Gallery Ảnh */
+        function addToCart(productId) {
+            fetch(`/Cart/AddToCart?productId=${productId}&quantity=1`)
+                .then(res => {
+                    if (res.ok) {
+                        // Bạn nên dùng thư viện Toastr hoặc Swal để thông báo đẹp hơn
+                        alert("✅ Đã thêm " + productId + " vào giỏ hàng");
+                        if(typeof updateCartCount === 'function') updateCartCount();
+                    } else {
+                        alert("❌ Lỗi khi thêm vào giỏ hàng");
+                    }
+                });
+        }
+    </script>
+}
+
+@section Styles {
+    <style>
+        :root {
+            --primary-color: #0d6efd;
+            --text-dark: #2d3436;
+            --text-muted: #636e72;
+        }
+
+        .product-detail-container {
+            background: #fff;
+            border-radius: 30px;
+            padding: 40px;
+            box-shadow: 0 15px 50px rgba(0,0,0,0.05);
+        }
+
+        .back-link {
+            text-decoration: none;
+            color: var(--text-muted);
+            font-weight: 700;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            transition: 0.3s;
+        }
+
+            .back-link:hover {
+                color: var(--primary-color);
+            }
+
+        /* Gallery */
         .main-img-wrapper {
-            background: #f8f9fa;
-            border-radius: 20px;
+            background: #fdfdfd;
+            border-radius: 24px;
             overflow: hidden;
-            margin-bottom: 15px;
             display: flex;
             align-items: center;
             justify-content: center;
             aspect-ratio: 1/1;
-            border: 1px solid #eee;
+            border: 1px solid #f0f0f0;
+            padding: 20px;
         }
 
         #mainImg {
             max-width: 100%;
             max-height: 100%;
             object-fit: contain;
-            transition: 0.3s;
         }
 
         .thumb-img {
-            width: 80px;
-            height: 80px;
+            width: 70px;
+            height: 70px;
             object-fit: cover;
             border-radius: 12px;
             cursor: pointer;
@@ -181,66 +213,123 @@
             transition: 0.2s;
         }
 
-            .thumb-img:hover, .thumb-img.active {
-                border-color: #0d6efd;
-                transform: translateY(-2px);
+            .thumb-img.active {
+                border-color: var(--primary-color);
+                transform: scale(1.05);
             }
 
-        /* Thông tin */
+        /* Info */
         .product-name {
             font-weight: 800;
-            font-size: 2rem;
-            color: #2d3436;
-            margin-bottom: 15px;
+            font-size: 2.4rem;
+            color: var(--text-dark);
+        }
+
+        .price-section {
+            display: flex;
+            align-items: center;
+            margin: 20px 0;
         }
 
         .price-tag {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: #0d6efd;
-            background: #f0f7ff;
-            display: inline-block;
-            padding: 5px 20px;
-            border-radius: 12px;
-            margin-bottom: 20px;
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: var(--primary-color);
+        }
+
+        .product-info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 20px;
         }
 
         .info-label {
-            font-weight: 600;
-            color: #636e72;
-            width: 120px;
-            display: inline-block;
+            display: block;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-bottom: 5px;
         }
 
-        /* Nút bấm */
+        .info-value {
+            display: block;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        /* Buttons */
         .btn-buy {
-            background: #0d6efd;
+            background: var(--primary-color);
             color: white;
-            padding: 12px 35px;
-            border-radius: 15px;
+            padding: 16px;
+            border-radius: 16px;
             font-weight: 700;
             border: none;
             transition: 0.3s;
-            box-shadow: 0 4px 15px rgba(13, 110, 253, 0.2);
+            box-shadow: 0 8px 20px rgba(13, 110, 253, 0.2);
         }
 
             .btn-buy:hover {
-                background: #0b5ed7;
-                transform: translateY(-2px);
-                box-shadow: 0 6px 20px rgba(13, 110, 253, 0.3);
+                transform: translateY(-3px);
+                box-shadow: 0 10px 25px rgba(13, 110, 253, 0.3);
+                color: white;
             }
 
-        /* Bảng thông số */
-        .spec-table {
-            border-radius: 15px;
-            overflow: hidden;
-            border: 1px solid #f0f0f0;
+        .btn-wishlist {
+            width: 60px;
+            border-radius: 16px;
+            border: 1px solid #dee2e6;
+            color: var(--text-muted);
+            transition: 0.3s;
         }
 
-            .spec-table th {
-                background: #f8f9fa;
-                color: #636e72;
-                font-weight: 600;
+            .btn-wishlist:hover {
+                background: #fff0f3;
+                color: #ff4757;
+                border-color: #ff4757;
+            }
+
+        .shipping-card {
+            padding: 15px;
+            background: #eef2ff;
+            border-radius: 18px;
+            color: #4338ca;
+        }
+
+        .icon-box {
+            width: 45px;
+            height: 45px;
+            background: white;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .section-title {
+            position: relative;
+            font-weight: 800;
+        }
+
+            .section-title span {
+                background: #fff;
+                padding-right: 20px;
+                position: relative;
+                z-index: 1;
+            }
+
+            .section-title::after {
+                content: "";
+                position: absolute;
+                left: 0;
+                top: 50%;
+                width: 100%;
+                height: 1px;
+                background: #eee;
+                z-index: 0;
             }
     </style>
 }

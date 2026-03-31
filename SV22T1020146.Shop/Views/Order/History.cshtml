@@ -1,37 +1,239 @@
-﻿@{
+﻿@using SV22T1020146.Models.Sales
+@model SV22T1020146.Shop.Models.OrderHistoryViewModel
+
+@{
     ViewData["Title"] = "Lịch sử mua hàng";
+    // Lấy trạng thái hiện tại từ QueryString để active Tab tương ứng
+    var currentStatus = Context.Request.Query["status"].ToString() ?? "0";
 }
 
-<div class="card shadow-sm border-0 rounded-4 p-4">
-    <h4 class="fw-bold mb-4"><i class="fa-solid fa-clock-rotate-left me-2 text-primary"></i> Đơn hàng của bạn</h4>
+<div class="container py-5">
+    <div class="history-card">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div class="d-flex align-items-center">
+                <div class="bg-primary bg-opacity-10 p-3 rounded-3 me-3 text-primary">
+                    <i class="fa-solid fa-bag-shopping fs-3"></i>
+                </div>
+                <div>
+                    <h3 class="fw-bold mb-1">Đơn hàng của tôi</h3>
+                    <p class="text-muted small mb-0">Theo dõi và quản lý quá trình mua sắm của bạn</p>
+                </div>
+            </div>
+            <a href="/Product" class="btn btn-primary rounded-pill px-4 shadow-sm">
+                <i class="fa-solid fa-cart-plus me-2"></i>Tiếp tục mua sắm
+            </a>
+        </div>
 
-    <div class="table-responsive">
-        <table class="table table-hover align-middle">
-            <thead class="bg-light">
-                <tr class="small text-muted">
-                    <th>Mã đơn</th>
-                    <th>Ngày mua</th>
-                    <th>Tổng tiền</th>
-                    <th>Trạng thái</th>
-                    <th>Thao tác</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td class="fw-bold">#ORD-1001</td>
-                    <td>15/03/2026</td>
-                    <td class="fw-bold text-primary">32.000.000₫</td>
-                    <td><span class="badge bg-success-subtle text-success border border-success px-3">Hoàn thành</span></td>
-                    <td><a href="/Order/Tracking/1001" class="btn btn-sm btn-outline-primary rounded-pill px-3">Chi tiết</a></td>
-                </tr>
-                <tr>
-                    <td class="fw-bold">#ORD-1002</td>
-                    <td>28/03/2026</td>
-                    <td class="fw-bold text-primary">1.200.000₫</td>
-                    <td><span class="badge bg-warning-subtle text-warning border border-warning px-3">Đang giao</span></td>
-                    <td><a href="/Order/Tracking/1002" class="btn btn-sm btn-outline-primary rounded-pill px-3">Theo dõi</a></td>
-                </tr>
-            </tbody>
-        </table>
+        <div class="status-filter-wrapper mb-5">
+            <div class="nav nav-pills nav-fill bg-light p-1 rounded-4 shadow-sm border">
+                <a class="nav-link rounded-pill @(currentStatus == "0" ? "active" : "")" href="/Order/History?status=0">
+                    Tất cả
+                </a>
+                <a class="nav-link rounded-pill @(currentStatus == "1" ? "active" : "")" href="/Order/History?status=1">
+                    Chờ xử lý
+                </a>
+                <a class="nav-link rounded-pill @(currentStatus == "2" ? "active" : "")" href="/Order/History?status=2">
+                    Đã xác nhận
+                </a>
+                <a class="nav-link rounded-pill @(currentStatus == "3" ? "active" : "")" href="/Order/History?status=3">
+                    Đang giao
+                </a>
+                <a class="nav-link rounded-pill @(currentStatus == "4" ? "active" : "")" href="/Order/History?status=4">
+                    Hoàn tất
+                </a>
+                <a class="nav-link rounded-pill @(currentStatus == "-1" ? "active" : "")" href="/Order/History?status=-1">
+                    Đã hủy
+                </a>
+                <a class="nav-link rounded-pill @(currentStatus == "-2" ? "active" : "")" href="/Order/History?status=-2">
+                    Bị từ chối
+                </a>
+            </div>
+        </div>
+
+        @if (Model.Orders != null && Model.Orders.Any())
+        {
+            <div class="table-responsive">
+                <table class="table align-middle table-hover">
+                    <thead>
+                        <tr>
+                            <th class="ps-4">Mã đơn</th>
+                            <th>Thời gian đặt</th>
+                            <th class="text-center">Trạng thái</th>
+                            <th class="text-end pe-4">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.Orders)
+                        {
+                            var status = (OrderStatusEnum)item.Status;
+                            <tr>
+                                <td class="ps-4">
+                                    <span class="order-id">#@item.OrderID</span>
+                                </td>
+                                <td>
+                                    <div class="d-flex flex-column">
+                                        <span class="fw-bold text-dark">@item.OrderTime.ToString("dd/MM/yyyy")</span>
+                                        <span class="text-muted small">@item.OrderTime.ToString("HH:mm")</span>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    @switch (status)
+                                    {
+                                        case OrderStatusEnum.New:
+                                            <span class="status-badge badge-new">Chờ xử lý</span>
+                                            break;
+                                        case OrderStatusEnum.Accepted:
+                                            <span class="status-badge badge-accepted">Đã xác nhận</span>
+                                            break;
+                                        case OrderStatusEnum.Shipping:
+                                            <span class="status-badge badge-shipping">Đang giao</span>
+                                            break;
+                                        case OrderStatusEnum.Completed:
+                                            <span class="status-badge badge-completed">Hoàn tất</span>
+                                            break;
+                                        case OrderStatusEnum.Cancelled:
+                                            <span class="status-badge badge-cancelled">Đã hủy</span>
+                                            break;
+                                        case OrderStatusEnum.Rejected:
+                                            <span class="status-badge badge-rejected">Bị từ chối</span>
+                                            break;
+                                        default:
+                                            <span class="status-badge bg-light">@item.Status</span>
+                                            break;
+                                    }
+                                </td>
+                                <td class="text-end pe-4">
+                                    <a href="@Url.Action("Tracking", "Order", new { orderId = item.OrderID })"
+                                       class="btn btn-outline-primary btn-sm btn-view">
+                                        Xem chi tiết
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="text-center py-5 border rounded-4 bg-light bg-opacity-50">
+                <div class="mb-4">
+                    <i class="fa-solid fa-box-open text-muted" style="font-size: 5rem; opacity: 0.3;"></i>
+                </div>
+                <h5 class="text-muted fw-bold">Không tìm thấy đơn hàng nào!</h5>
+                <p class="text-muted small mb-4">Bạn chưa có đơn hàng nào ở trạng thái này.</p>
+                <a href="/Order/History" class="btn btn-outline-secondary rounded-pill px-4">
+                    Xem tất cả đơn hàng
+                </a>
+            </div>
+        }
     </div>
 </div>
+
+@section Styles {
+    <style>
+        .history-card {
+            border: none;
+            border-radius: 24px;
+            background: #fff;
+            box-shadow: 0 15px 45px rgba(0,0,0,0.05);
+            padding: 40px;
+        }
+
+        /* Tabs Filter Style */
+        .status-filter-wrapper .nav-pills {
+            border-color: #f1f3f5 !important;
+        }
+
+        .status-filter-wrapper .nav-link {
+            color: #6c757d;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            padding: 12px 10px;
+        }
+
+            .status-filter-wrapper .nav-link:hover {
+                color: #0d6efd;
+            }
+
+            .status-filter-wrapper .nav-link.active {
+                background-color: #fff !important;
+                color: #0d6efd !important;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+                transform: scale(1.02);
+            }
+
+        /* Table Style */
+        .table thead th {
+            border: none;
+            background-color: #f8f9fa;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 1px;
+            color: #8898aa;
+            padding: 15px 20px;
+        }
+
+        .order-id {
+            font-weight: 700;
+            color: #0d6efd;
+            font-family: 'Segoe UI Mono', 'Consolas', monospace;
+        }
+
+        /* Status Badges */
+        .status-badge {
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            display: inline-block;
+            min-width: 120px;
+            text-align: center;
+        }
+
+        .badge-new {
+            background: #e0f2fe;
+            color: #0369a1;
+        }
+
+        .badge-accepted {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge-shipping {
+            background: #e0e7ff;
+            color: #3730a3;
+        }
+
+        .badge-completed {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .badge-cancelled {
+            background: #f3f4f6;
+            color: #4b5563;
+        }
+
+        .badge-rejected {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .btn-view {
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            padding: 8px 20px;
+        }
+
+            .btn-view:hover {
+                background: #0d6efd;
+                color: white !important;
+                transform: translateY(-2px);
+                box-shadow: 0 4px 15px rgba(13, 110, 253, 0.2);
+            }
+    </style>
+}

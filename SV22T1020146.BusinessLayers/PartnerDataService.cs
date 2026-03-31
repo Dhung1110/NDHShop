@@ -173,9 +173,6 @@ public static class PartnerDataService
         if (string.IsNullOrWhiteSpace(data.CustomerName))
             return 0;
 
-        if (string.IsNullOrWhiteSpace(data.ContactName))
-            return 0;
-
         if (string.IsNullOrWhiteSpace(data.Email))
             return 0;
 

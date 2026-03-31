@@ -26,6 +26,9 @@ namespace SV22T1020146.Shop.Controllers
             var product = await CatalogDataService.GetProductAsync(productId);
             if (product == null)
                 return NotFound();
+            
+            if (!product.IsSelling)
+                return BadRequest("Sản phẩm hiện không khả dụng");
 
             ShoppingCartHelper.AddItemToCart(new OrderDetailViewInfo()
             {

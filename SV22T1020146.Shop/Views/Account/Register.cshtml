@@ -35,7 +35,7 @@
                                     <label class="form-label small fw-bold text-muted ps-2">Họ và tên</label>
                                     <div class="input-group-custom">
                                         <i class="fa-solid fa-signature"></i>
-                                        <input asp-for="CustomerName" class="form-control" placeholder="Nguyễn Văn A">
+                                        <input asp-for="CustomerName" class="form-control" placeholder="">
                                     </div>
                                     <span asp-validation-for="CustomerName" class="text-danger validation-msg"></span>
                                 </div>
@@ -44,7 +44,7 @@
                                     <label class="form-label small fw-bold text-muted ps-2">Số điện thoại</label>
                                     <div class="input-group-custom">
                                         <i class="fa-solid fa-phone"></i>
-                                        <input asp-for="Phone" class="form-control" placeholder="09xxxxxxx">
+                                        <input asp-for="Phone" class="form-control" placeholder="">
                                     </div>
                                     <span asp-validation-for="Phone" class="text-danger validation-msg"></span>
                                 </div>
@@ -68,7 +68,7 @@
                                     <label class="form-label small fw-bold text-muted ps-2">Địa chỉ chi tiết</label>
                                     <div class="input-group-custom">
                                         <i class="fa-solid fa-house-user"></i>
-                                        <input asp-for="Address" class="form-control" placeholder="Số nhà, đường...">
+                                        <input asp-for="Address" class="form-control" placeholder="">
                                     </div>
                                     <span asp-validation-for="Address" class="text-danger validation-msg"></span>
                                 </div>
@@ -81,7 +81,7 @@
                                     <label class="form-label small fw-bold text-muted ps-2">Email đăng nhập</label>
                                     <div class="input-group-custom">
                                         <i class="fa-solid fa-envelope"></i>
-                                        <input asp-for="Email" class="form-control" placeholder="example@gmail.com">
+                                        <input asp-for="Email" class="form-control" placeholder="">
                                     </div>
                                     <span asp-validation-for="Email" class="text-danger validation-msg"></span>
                                 </div>
@@ -90,7 +90,7 @@
                                     <label class="form-label small fw-bold text-muted ps-2">Mật khẩu</label>
                                     <div class="input-group-custom">
                                         <i class="fa-solid fa-lock"></i>
-                                        <input asp-for="Password" type="password" class="form-control" id="regPass" placeholder="••••••••">
+                                        <input asp-for="Password" type="password" class="form-control" id="regPass" placeholder="">
                                         <i class="fa-solid fa-eye-slash small ms-auto cursor-pointer text-muted" onclick="togglePass('regPass', this)"></i>
                                     </div>
                                     <span asp-validation-for="Password" class="text-danger validation-msg"></span>
@@ -100,7 +100,7 @@
                                     <label class="form-label small fw-bold text-muted ps-2">Xác nhận mật khẩu</label>
                                     <div class="input-group-custom">
                                         <i class="fa-solid fa-shield-check"></i>
-                                        <input asp-for="ConfirmPassword" type="password" class="form-control" id="confirmPass" placeholder="••••••••">
+                                        <input asp-for="ConfirmPassword" type="password" class="form-control" id="confirmPass" placeholder="">
                                     </div>
                                     <span asp-validation-for="ConfirmPassword" class="text-danger validation-msg"></span>
                                 </div>

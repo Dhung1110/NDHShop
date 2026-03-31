@@ -69,9 +69,11 @@ namespace SV22T1020146.Shop.Controllers
                 return View(model);
             }
 
+            
+            TempData["RegisterSuccess"] = "Đăng ký tài khoản thành công! Bạn có thể đăng nhập ngay.";
+
             return RedirectToAction("Login");
         }
-
         /// <summary>
         /// Đăng Nhập 
         /// </summary>

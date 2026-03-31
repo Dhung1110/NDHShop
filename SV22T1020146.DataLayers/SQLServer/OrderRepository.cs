@@ -25,7 +25,11 @@ namespace SV22T1020146.DataLayers.SQLServer
             {
                 await connection.OpenAsync();
 
+                // 🔥 WHERE
                 string where = "WHERE 1=1";
+
+                // 🔥 filter theo user (QUAN TRỌNG)
+                where += " AND (@CustomerID IS NULL OR o.CustomerID = @CustomerID)";
 
                 if (!string.IsNullOrWhiteSpace(input.SearchValue))
                     where += " AND c.CustomerName LIKE @SearchValue";
@@ -39,15 +43,18 @@ namespace SV22T1020146.DataLayers.SQLServer
                 if (input.DateTo.HasValue)
                     where += " AND o.OrderTime <= @DateTo";
 
-                // 👉 COUNT
+                // ================= COUNT =================
                 string countSql = $@"
-        SELECT COUNT(*)
-        FROM Orders o
-        LEFT JOIN Customers c ON o.CustomerID = c.CustomerID
-        {where}";
+            SELECT COUNT(*)
+            FROM Orders o
+            LEFT JOIN Customers c ON o.CustomerID = c.CustomerID
+            {where}";
 
                 using (var cmd = new SqlCommand(countSql, connection))
                 {
+                    // 🔥 THÊM PARAM
+                    cmd.Parameters.AddWithValue("@CustomerID", (object?)input.CustomerID ?? DBNull.Value);
+
                     if (!string.IsNullOrWhiteSpace(input.SearchValue))
                         cmd.Parameters.AddWithValue("@SearchValue", $"%{input.SearchValue}%");
 
@@ -63,32 +70,30 @@ namespace SV22T1020146.DataLayers.SQLServer
                     result.RowCount = Convert.ToInt32(await cmd.ExecuteScalarAsync());
                 }
 
-                // 👉 DATA
+                // ================= DATA =================
                 string sql = $@"
-        SELECT 
-            o.OrderID,
-            o.OrderTime,
-            o.AcceptTime,
-            o.Status,
-
-            c.CustomerName,
-            c.Phone AS CustomerPhone,
-
-            e.FullName AS EmployeeName
-
-        FROM Orders o
-        LEFT JOIN Customers c ON o.CustomerID = c.CustomerID
-        LEFT JOIN Employees e ON o.EmployeeID = e.EmployeeID
-
-        {where}
-
-        ORDER BY o.OrderID DESC
-        OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY";
+            SELECT 
+                o.OrderID,
+                o.OrderTime,
+                o.AcceptTime,
+                o.Status,
+                c.CustomerName,
+                c.Phone AS CustomerPhone,
+                e.FullName AS EmployeeName
+            FROM Orders o
+            LEFT JOIN Customers c ON o.CustomerID = c.CustomerID
+            LEFT JOIN Employees e ON o.EmployeeID = e.EmployeeID
+            {where}
+            ORDER BY o.OrderID DESC
+            OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY";
 
                 using (var cmd = new SqlCommand(sql, connection))
                 {
                     cmd.Parameters.AddWithValue("@Offset", (input.Page - 1) * input.PageSize);
                     cmd.Parameters.AddWithValue("@PageSize", input.PageSize);
+
+                    // 🔥 THÊM PARAM
+                    cmd.Parameters.AddWithValue("@CustomerID", (object?)input.CustomerID ?? DBNull.Value);
 
                     if (!string.IsNullOrWhiteSpace(input.SearchValue))
                         cmd.Parameters.AddWithValue("@SearchValue", $"%{input.SearchValue}%");

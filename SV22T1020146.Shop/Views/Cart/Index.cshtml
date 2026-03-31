@@ -50,7 +50,11 @@
                                     <tr>
                                         <td>
                                             <div class="d-flex align-items-center">
-                                                <img src="@item.Photo" class="product-img me-3 border shadow-sm">
+                                                <img src="@(string.IsNullOrEmpty(item.Photo)
+                                                                  ? "/images/no-image.png"
+                                                                  : "/images/products/" + Uri.EscapeDataString(item.Photo))"
+                                             class="product-img me-3 border shadow-sm"
+                                             alt="@item.ProductName">
                                                 <div>
                                                     <h6 class="mb-0 fw-bold">@item.ProductName</h6>
                                                     <small class="text-muted">Mã SP: @item.ProductID</small>

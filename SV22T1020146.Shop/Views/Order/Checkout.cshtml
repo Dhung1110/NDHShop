@@ -1,5 +1,201 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model List<SV22T1020146.Models.Sales.OrderDetailViewInfo>
+
 @{
+    ViewData["Title"] = "Thanh toán đơn hàng";
+    var customer = ViewBag.Customer as SV22T1020146.Models.Partner.Customer;
+    decimal total = 0;
+}
+
+<div class="container py-5">
+    <div class="row g-5">
+
+        <!-- Thông tin giao hàng -->
+        <div class="col-lg-7">
+            <div class="checkout-card p-4">
+                <h4 class="fw-bold section-title">Thông tin giao hàng</h4>
+
+                <!-- Form POST tới Checkout -->
+                <form method="post" action="@Url.Action("Checkout", "Order")">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Họ và tên người nhận</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0">
+                                    <i class="fa-solid fa-user text-muted"></i>
+                                </span>
+                                <input class="form-control border-start-0 ps-0" type="text" value="@customer?.CustomerName" readonly />
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Số điện thoại</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0">
+                                    <i class="fa-solid fa-phone text-muted"></i>
+                                </span>
+                                <input class="form-control border-start-0 ps-0" type="text" value="@customer?.Phone" readonly />
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label">Tỉnh / Thành phố</label>
+                            <input class="form-control rounded-3" type="text" name="province"
+                                   value="@customer?.Province" placeholder="Nhập tỉnh/thành phố..." required />
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label">Địa chỉ nhận hàng chi tiết</label>
+                            <textarea class="form-control rounded-3" name="address" rows="3"
+                                      placeholder="Số nhà, tên đường, phường/xã..." required>@customer?.Address</textarea>
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label">Ghi chú đơn hàng (Tùy chọn)</label>
+                            <input class="form-control rounded-3" type="text" name="note" placeholder="Ví dụ: Giao giờ hành chính..." />
+                        </div>
+                    </div>
+
+                    <div class="mt-4 p-3 bg-light rounded-3 small text-muted">
+                        <i class="fa-solid fa-circle-info me-2 text-primary"></i>
+                        Vui lòng kiểm tra kỹ thông tin trước khi nhấn đặt hàng. Chúng tôi sẽ liên hệ qua số điện thoại để xác nhận đơn hàng.
+                    </div>
+
+                    <!-- Nút submit phải nằm trong form -->
+                    <button type="submit" class="btn btn-order btn-success w-100 shadow mt-3">
+                        <i class="fa-solid fa-check-double me-2"></i> XÁC NHẬN ĐẶT HÀNG
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Danh sách sản phẩm -->
+        <div class="col-lg-5">
+            <div class="checkout-card p-4 h-100">
+                <h4 class="fw-bold section-title">Đơn hàng của bạn</h4>
+
+                <div class="order-list mb-4">
+                    @foreach (var item in Model)
+                    {
+                        var money = item.Quantity * item.SalePrice;
+                        total += money;
+
+                        <div class="order-item d-flex align-items-center justify-content-between">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="position-relative">
+                                    <img src="@Url.Content("~/images/products/" + item.Photo)" class="item-img border">
+                                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-secondary shadow-sm">
+                                        @item.Quantity
+                                    </span>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0 fw-bold small text-dark text-truncate" style="max-width: 180px;">@item.ProductName</h6>
+                                    <small class="text-muted">@item.SalePrice.ToString("N0") ₫</small>
+                                </div>
+                            </div>
+                            <span class="fw-bold text-dark small">@money.ToString("N0") ₫</span>
+                        </div>
+                    }
+                </div>
+
+                <div class="summary-box">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Tạm tính:</span>
+                        <span class="text-dark">@total.ToString("N0") ₫</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-3">
+                        <span class="text-muted">Phí vận chuyển:</span>
+                        <span class="text-success fw-bold">Miễn phí</span>
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <span class="fw-bold fs-5">Tổng tiền thanh toán:</span>
+                        <span class="fw-bold text-primary fs-3">@total.ToString("N0") ₫</span>
+                    </div>
+
+                    <div class="text-center mt-3">
+                        <a href="/Cart" class="text-decoration-none small fw-bold">
+                            <i class="fa-solid fa-chevron-left me-1"></i> Quay về giỏ hàng
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        .checkout-card {
+            border: none;
+            border-radius: 20px;
+            background: #fff;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #495057;
+            font-size: 0.9rem;
+        }
+
+        .form-control[readonly] {
+            background-color: #f8f9fa;
+            border-color: #e9ecef;
+            color: #6c757d;
+        }
+
+        .order-item {
+            border-bottom: 1px solid #f1f3f5;
+            padding: 15px 0;
+        }
+
+            .order-item:last-child {
+                border-bottom: none;
+            }
+
+        .item-img {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+
+        .summary-box {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+        }
+
+        .btn-order {
+            background: #198754;
+            border: none;
+            border-radius: 12px;
+            padding: 15px;
+            font-weight: 700;
+            transition: 0.3s;
+        }
+
+            .btn-order:hover {
+                background: #157347;
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(25, 135, 84, 0.3);
+            }
+
+        .section-title {
+            position: relative;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+            .section-title::after {
+                content: "";
+                position: absolute;
+                left: 0;
+                bottom: 0;
+                width: 50px;
+                height: 3px;
+                background: #0d6efd;
+                border-radius: 3px;
+            }
+    </style>
 }

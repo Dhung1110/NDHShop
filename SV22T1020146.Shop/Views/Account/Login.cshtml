@@ -17,13 +17,20 @@
                             <h2 class="fw-bold text-dark">Đăng nhập</h2>
                             <p class="text-muted small">Chào mừng bạn quay trở lại với hệ thống</p>
                         </div>
-
+                        @if (TempData["RegisterSuccess"] != null)
+                        {
+                            <div class="alert alert-success alert-dismissible fade show rounded-4 mb-4" role="alert">
+                                <i class="fa-solid fa-circle-check me-2"></i>
+                                @TempData["RegisterSuccess"]
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        }
                         <form asp-action="Login" method="post">
                             <div class="mb-4">
                                 <label class="form-label small fw-bold text-muted ps-3">Tài khoản Email</label>
                                 <div class="input-group-custom d-flex align-items-center">
                                     <i class="fa-solid fa-envelope text-muted"></i>
-                                    <input asp-for="Email" class="form-control" placeholder="name@example.com" />
+                                    <input asp-for="Email" class="form-control" placeholder="" />
                                 </div>
                                 <span asp-validation-for="Email" class="text-danger small ps-3"></span>
                             </div>
@@ -32,7 +39,7 @@
                                 <label class="form-label small fw-bold text-muted ps-3">Mật khẩu</label>
                                 <div class="input-group-custom d-flex align-items-center">
                                     <i class="fa-solid fa-key text-muted"></i>
-                                    <input asp-for="Password" type="password" class="form-control" id="passInput" placeholder="••••••••" />
+                                    <input asp-for="Password" type="password" class="form-control" id="passInput" placeholder="" />
                                     <i class="fa-solid fa-eye text-muted cursor-pointer" onclick="togglePass('passInput', this)"></i>
                                 </div>
                                 <span asp-validation-for="Password" class="text-danger small ps-3"></span>

@@ -1,58 +1,231 @@
-﻿@{
-    ViewData["Title"] = "Theo dõi đơn hàng";
+﻿@using SV22T1020146.Models.Sales
+@model SV22T1020146.Shop.Models.OrderHistoryViewModel
+
+@{
+    ViewData["Title"] = "Theo dõi đơn hàng #" + Model.CurrentOrder.OrderID;
+    var order = Model.CurrentOrder;
+    var status = (OrderStatusEnum)order.Status;
+    decimal total = 0;
 }
 
-<div class="card shadow-sm border-0 rounded-4 p-5">
-    <div class="text-center mb-5">
-        <h3 class="fw-bold">Trạng thái đơn hàng: <span class="text-primary">#ORD-1002</span></h3>
-        <p class="text-muted">Đặt ngày 28 tháng 03, 2026</p>
-    </div>
 
-    <div class="position-relative mb-5 py-4">
-        <div class="progress" style="height: 4px;">
-            <div class="progress-bar" role="progressbar" style="width: 66%;"></div>
-        </div>
-        <div class="d-flex justify-content-between position-absolute w-100 top-50 translate-middle-y">
-            <div class="text-center bg-white">
-                <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center mx-auto shadow" style="width:40px; height:40px;">
-                    <i class="fa fa-check"></i>
-                </div>
-                <p class="small fw-bold mt-2 mb-0">Đã xác nhận</p>
-            </div>
-            <div class="text-center bg-white">
-                <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center mx-auto shadow" style="width:40px; height:40px;">
-                    <i class="fa fa-box"></i>
-                </div>
-                <p class="small fw-bold mt-2 mb-0">Đang đóng gói</p>
-            </div>
-            <div class="text-center bg-white">
-                <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center mx-auto shadow" style="width:40px; height:40px;">
-                    <i class="fa fa-truck"></i>
-                </div>
-                <p class="small fw-bold mt-2 mb-0">Đang vận chuyển</p>
-            </div>
-            <div class="text-center bg-white text-muted">
-                <div class="rounded-circle bg-light d-flex align-items-center justify-content-center mx-auto" style="width:40px; height:40px;">
-                    <i class="fa fa-home"></i>
-                </div>
-                <p class="small mt-2 mb-0">Giao thành công</p>
-            </div>
-        </div>
-    </div>
 
-    <div class="bg-light rounded-4 p-4 mt-4">
-        <div class="row">
-            <div class="col-md-6 border-end">
-                <h6 class="fw-bold text-muted mb-3">ĐỊA CHỈ NHẬN HÀNG</h6>
-                <p class="mb-1 fw-bold">Trần Quang Hiếu</p>
-                <p class="mb-1 small text-muted">0905 123 456</p>
-                <p class="mb-0 small text-muted">77 Nguyễn Huệ, Phường Vĩnh Ninh, TP Huế</p>
+<div class="container py-5">
+    <div class="tracking-card p-4 p-md-5">
+        <div class="d-flex justify-content-between align-items-center mb-5 flex-wrap gap-3">
+            <div>
+                <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 rounded-pill mb-2">Chi tiết vận chuyển</span>
+                <h2 class="fw-bold mb-1">Mã đơn: <span class="text-primary">#@order.OrderID</span></h2>
+                <p class="text-muted small mb-0"><i class="fa-regular fa-calendar me-1"></i> Ngày đặt: @order.OrderTime.ToString("dd/MM/yyyy HH:mm")</p>
             </div>
-            <div class="col-md-6 ps-4">
-                <h6 class="fw-bold text-muted mb-3">THÔNG TIN GIAO HÀNG</h6>
-                <p class="mb-1 small">Giao bởi: <span class="fw-bold">Giao Hàng Nhanh</span></p>
-                <p class="mb-0 small">Dự kiến nhận: <span class="fw-bold">30/03/2026</span></p>
+            <a href="/Order/History" class="btn btn-outline-secondary rounded-pill px-4">
+                <i class="fa-solid fa-chevron-left me-2"></i>Lịch sử mua hàng
+            </a>
+        </div>
+
+        @if (status != OrderStatusEnum.Cancelled && status != OrderStatusEnum.Rejected)
+        {
+            <div class="stepper-wrapper">
+                <div class="stepper-item @(status >= OrderStatusEnum.New ? "active" : "") @(status > OrderStatusEnum.New ? "completed" : "")">
+                    <div class="step-counter">@(status > OrderStatusEnum.New ? "✓" : "1")</div>
+                    <div class="step-name">Vừa đặt</div>
+                </div>
+                <div class="stepper-item @(status >= OrderStatusEnum.Accepted ? "active" : "") @(status > OrderStatusEnum.Accepted ? "completed" : "")">
+                    <div class="step-counter">@(status > OrderStatusEnum.Accepted ? "✓" : "2")</div>
+                    <div class="step-name">Xác nhận</div>
+                </div>
+                <div class="stepper-item @(status >= OrderStatusEnum.Shipping ? "active" : "") @(status > OrderStatusEnum.Shipping ? "completed" : "")">
+                    <div class="step-counter">@(status > OrderStatusEnum.Shipping ? "✓" : "3")</div>
+                    <div class="step-name">Đang giao</div>
+                </div>
+                <div class="stepper-item @(status >= OrderStatusEnum.Completed ? "active" : "")">
+                    <div class="step-counter">@(status == OrderStatusEnum.Completed ? "✓" : "4")</div>
+                    <div class="step-name">Hoàn tất</div>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-danger d-flex align-items-center p-4 rounded-4 mb-5 border-0 bg-danger bg-opacity-10">
+                <i class="fa-solid fa-circle-xmark text-danger fs-2 me-3"></i>
+                <div>
+                    <h5 class="text-danger fw-bold mb-1">Đơn hàng đã bị @(status == OrderStatusEnum.Cancelled ? "Hủy" : "Từ chối")</h5>
+                    <p class="mb-0 text-muted">Vui lòng liên hệ NDH SHOP để được hỗ trợ cụ thể hơn.</p>
+                </div>
+            </div>
+        }
+
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <h5 class="fw-bold mb-3">Sản phẩm đã chọn</h5>
+                <div class="table-responsive border rounded-4 shadow-sm bg-white">
+                    <table class="table align-middle mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="ps-4 border-0">Thông tin mặt hàng</th>
+                                <th class="text-center border-0">SL</th>
+                                <th class="text-end pe-4 border-0">Thành tiền</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.OrderDetails)
+                            {
+                                // Sửa lỗi bằng cách ép kiểu sang OrderDetailViewInfo
+                                var detail = item as SV22T1020146.Models.Sales.OrderDetailViewInfo;
+                                var subTotal = item.Quantity * item.SalePrice;
+                                total += subTotal;
+
+                                <tr>
+                                    <td class="ps-4 py-3">
+                                        <div class="d-flex align-items-center gap-3">
+
+                                            <img src="@(string.IsNullOrEmpty(detail?.Photo) ? "/images/no-image.png" : "/images/products/" + Uri.EscapeDataString(detail.Photo))"
+                                                 class="product-thumb shadow-sm"
+                                                 alt="@(detail?.ProductName ?? "Sản phẩm")">
+                                            <div>
+                                                @* Lấy ProductName từ biến detail *@
+                                                <div class="fw-bold text-dark">@(detail?.ProductName ?? "Sản phẩm #" + item.ProductID)</div>
+                                                <small class="text-muted">Đơn giá: @item.SalePrice.ToString("N0")₫ / @(detail?.Unit ?? "Cái")</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="text-center fw-bold">@item.Quantity</td>
+                                    <td class="text-end pe-4 fw-bold text-primary">@subTotal.ToString("N0")₫</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <h5 class="fw-bold mb-3">Tóm tắt hóa đơn</h5>
+                <div class="summary-row shadow-sm">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Tổng tiền hàng</span>
+                        <span class="fw-bold">@total.ToString("N0")₫</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Phí vận chuyển</span>
+                        <span class="text-success fw-bold">Miễn phí</span>
+                    </div>
+                    <hr class="my-3">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <span class="fw-bold text-dark fs-5">Cần thanh toán</span>
+                        <span class="fw-bold text-primary fs-2">@total.ToString("N0")₫</span>
+                    </div>
+                    <div class="p-3 bg-white rounded-3 border border-dashed text-center">
+                        <p class="small text-muted mb-0 italic">
+                            Cảm ơn bạn đã tin tưởng mua sắm tại <strong>NDH SHOP</strong>!
+                        </p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
+@section Styles {
+    <style>
+        .tracking-card {
+            border: none;
+            border-radius: 24px;
+            background: #fff;
+            box-shadow: 0 15px 45px rgba(0,0,0,0.07);
+        }
+
+        /* Stepper UI */
+        .stepper-wrapper {
+            display: flex;
+            justify-content: space-between;
+            margin: 40px 0;
+            position: relative;
+        }
+
+        .stepper-item {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+            z-index: 2;
+        }
+
+            .stepper-item::before {
+                position: absolute;
+                content: "";
+                border-bottom: 3px solid #edeff2;
+                width: 100%;
+                top: 20px;
+                left: -50%;
+                z-index: -1;
+            }
+
+            .stepper-item:first-child::before {
+                content: none;
+            }
+
+            .stepper-item.completed::before {
+                border-color: #198754;
+            }
+
+            .stepper-item.active::before {
+                border-color: #0d6efd;
+            }
+
+        .step-counter {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: #edeff2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 12px;
+            color: #adb5bd;
+            font-weight: 700;
+            border: 4px solid #fff;
+            box-shadow: 0 0 0 2px #edeff2;
+        }
+
+        .stepper-item.active .step-counter {
+            background: #0d6efd;
+            color: #fff;
+            box-shadow: 0 0 0 2px #0d6efd;
+        }
+
+        .stepper-item.completed .step-counter {
+            background: #198754;
+            color: #fff;
+            box-shadow: 0 0 0 2px #198754;
+        }
+
+        .step-name {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #adb5bd;
+        }
+
+        .active .step-name {
+            color: #0d6efd;
+        }
+
+        .completed .step-name {
+            color: #198754;
+        }
+
+        .product-thumb {
+            width: 65px;
+            height: 65px;
+            object-fit: cover;
+            border-radius: 12px;
+            border: 1px solid #eee;
+        }
+
+        .summary-row {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 20px;
+            border: 1px solid #eee;
+        }
+    </style>
+}

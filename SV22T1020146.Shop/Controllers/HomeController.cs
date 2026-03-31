@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using SV22T1020146.BusinessLayers;
+using SV22T1020146.Models.Catalog;
 using SV22T1020146.Shop.Models;
 using System.Diagnostics;
 
@@ -13,13 +15,24 @@ namespace SV22T1020146.Shop.Controllers
             _logger = logger;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            // Tạo một danh sách sản phẩm giả để hiển thị thử
-            var products = new List<string> { "iPhone 15", "Samsung S24", "MacBook M3", "iPad Pro" };
+            var input = new ProductSearchInput()
+            {
+                Page = 1,
+                PageSize = 1000, 
+                SearchValue = ""
+            };
 
-            // Gửi danh sách này sang View
-            return View(products);
+            var result = await CatalogDataService.ListProductsAsync(input);
+
+            
+            var randomProducts = result.DataItems
+                                       .OrderBy(x => Guid.NewGuid())
+                                       .Take(8)
+                                       .ToList();
+
+            return View(randomProducts); 
         }
 
         public IActionResult Privacy()
