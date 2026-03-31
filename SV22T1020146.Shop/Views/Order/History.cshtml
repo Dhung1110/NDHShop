@@ -1,0 +1,37 @@
+﻿@{
+    ViewData["Title"] = "Lịch sử mua hàng";
+}
+
+<div class="card shadow-sm border-0 rounded-4 p-4">
+    <h4 class="fw-bold mb-4"><i class="fa-solid fa-clock-rotate-left me-2 text-primary"></i> Đơn hàng của bạn</h4>
+
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead class="bg-light">
+                <tr class="small text-muted">
+                    <th>Mã đơn</th>
+                    <th>Ngày mua</th>
+                    <th>Tổng tiền</th>
+                    <th>Trạng thái</th>
+                    <th>Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="fw-bold">#ORD-1001</td>
+                    <td>15/03/2026</td>
+                    <td class="fw-bold text-primary">32.000.000₫</td>
+                    <td><span class="badge bg-success-subtle text-success border border-success px-3">Hoàn thành</span></td>
+                    <td><a href="/Order/Tracking/1001" class="btn btn-sm btn-outline-primary rounded-pill px-3">Chi tiết</a></td>
+                </tr>
+                <tr>
+                    <td class="fw-bold">#ORD-1002</td>
+                    <td>28/03/2026</td>
+                    <td class="fw-bold text-primary">1.200.000₫</td>
+                    <td><span class="badge bg-warning-subtle text-warning border border-warning px-3">Đang giao</span></td>
+                    <td><a href="/Order/Tracking/1002" class="btn btn-sm btn-outline-primary rounded-pill px-3">Theo dõi</a></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

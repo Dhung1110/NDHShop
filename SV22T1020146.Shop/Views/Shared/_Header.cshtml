@@ -1,0 +1,194 @@
+﻿@using Microsoft.AspNetCore.Http
+@{
+    var controller = ViewContext.RouteData.Values["Controller"]?.ToString();
+    var action = ViewContext.RouteData.Values["Action"]?.ToString();
+    bool isAuthPage = (controller == "Account" && (action == "Login" || action == "Register"));
+}
+
+<nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom sticky-top py-3">
+    <div class="container">
+        <a class="navbar-brand fw-bold fs-3" href="/">
+            <span class="text-primary">NDH</span><span class="text-dark">SHOP</span>
+        </a>
+
+        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navMain">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navMain">
+
+            @if (!isAuthPage)
+            {
+                @* Thanh tìm kiếm *@
+                <form class="d-flex flex-grow-1 mx-lg-4 my-2 my-lg-0 position-relative" style="max-width: 500px;" asp-controller="Product" asp-action="Search" method="get">
+                    <input name="searchValue" class="form-control rounded-pill ps-4 shadow-sm border-primary-subtle" type="search" placeholder="Bạn đang tìm gì hôm nay?">
+                    <button class="btn position-absolute end-0 me-2 text-primary" type="submit">
+                        <i class="fa fa-search"></i>
+                    </button>
+                </form>
+
+                @* Cụm Sản phẩm & Giỏ hàng: Cả 2 cùng màu xanh *@
+                <div class="navbar-nav align-items-center flex-row gap-3 ms-auto">
+
+                    @* Nút Sản phẩm *@
+                    <a class="nav-link fw-600 d-flex align-items-center py-2 text-primary @(controller == "Product" && action == "Index" ? "border-bottom border-primary border-2" : "")" href="/Product">
+                        <i class="fa-solid fa-box-open me-2 fs-5"></i>
+                        <span class="d-none d-md-inline">Sản phẩm</span>
+                    </a>
+
+                    @using SV22T1020146.BusinessLayers
+                @{
+                        var cartCount = ShoppingCartHelper.GetShoppingCart().Count;
+                    }
+
+                    @* Nút Giỏ hàng *@
+                    <a href="/Cart/Index" class="nav-link position-relative p-2 text-primary hover-effect">
+                        <i class="fa-solid fa-cart-shopping fs-4"></i>
+                        <span id="cart-count" class="badge rounded-pill bg-danger position-absolute top-0 start-100 translate-middle border border-light"
+                              style="font-size: 0.65rem; padding: 0.35em 0.65em;">
+                            @cartCount
+                        </span>
+                    </a>
+                </div>
+            }
+
+            <div class="navbar-nav ms-auto align-items-center">
+                @if (User.Identity.IsAuthenticated)
+                {
+                    <div class="nav-item dropdown ms-3">
+                        <a class="nav-link dropdown-toggle fw-600 d-flex align-items-center" href="#" data-bs-toggle="dropdown">
+                            <div class="bg-primary text-white rounded-circle me-2 d-flex align-items-center justify-content-center" style="width:32px; height:32px;">
+                                <i class="fa fa-user small"></i>
+                            </div>
+                            @User.Identity.Name
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2 p-2 rounded-3">
+                            <li>
+                                <a class="dropdown-item py-2" href="/Account/Profile">
+                                    <i class="fa-regular fa-id-card me-2 text-primary"></i> Hồ sơ cá nhân
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item py-2" href="/Account/ChangePassword">
+                                    <i class="fa-solid fa-shield-halved me-2 text-warning"></i> Đổi mật khẩu
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item py-2" href="/Order/History">
+                                    <i class="fa-solid fa-clock-rotate-left me-2 text-info"></i> Lịch sử mua hàng
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item py-2" href="/Order/Tracking">
+                                    <i class="fa-solid fa-truck-fast me-2 text-success"></i> Theo dõi đơn hàng
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <form asp-action="Logout" asp-controller="Account" method="post">
+                                    <button type="submit" class="dropdown-item text-danger border-0 bg-transparent w-100 text-start py-2">
+                                        <i class="fa-solid fa-arrow-right-from-bracket me-2"></i> Đăng xuất
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
+                }
+                else
+                {
+                    @if (action != "Login")
+                    {
+                        <div class="ms-3">
+                            <a class="btn btn-outline-dark rounded-pill px-4 fw-600" href="/Account/Login">Đăng nhập</a>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+</nav>
+@section Scripts{
+    <script>
+        function addToCart(productId, imgSelector = null) {
+        fetch(`/Cart/AddToCart?productId=${productId}&quantity=1`)
+            .then(res => {
+                if (res.ok) {
+                    // Lấy ảnh bay vào giỏ
+                    if (imgSelector) {
+                        let img = document.querySelector(imgSelector);
+                        if (img) flyToCart(img);
+                    }
+                    updateCartCount();
+                }
+            });
+    }
+
+    // Cập nhật số lượng badge
+    function updateCartCount() {
+        fetch('/Cart/GetCount')
+            .then(res => res.text())
+            .then(count => {
+                let badge = document.getElementById("cart-count");
+                if (badge) badge.innerText = count;
+            });
+    }
+
+    // Hiệu ứng bay vào giỏ
+    function flyToCart(img) {
+        let cartIcon = document.querySelector('a[href="/Cart/Index"]');
+        if (!cartIcon) return;
+
+        let flyImg = img.cloneNode(true);
+        flyImg.style.position = 'fixed';
+        flyImg.style.zIndex = 1000;
+        flyImg.style.width = img.offsetWidth + 'px';
+        flyImg.style.height = img.offsetHeight + 'px';
+        flyImg.style.top = img.getBoundingClientRect().top + 'px';
+        flyImg.style.left = img.getBoundingClientRect().left + 'px';
+        flyImg.style.transition = 'all 0.8s ease-in-out';
+        document.body.appendChild(flyImg);
+
+        let cartRect = cartIcon.getBoundingClientRect();
+        setTimeout(() => {
+            flyImg.style.top = cartRect.top + 'px';
+            flyImg.style.left = cartRect.left + 'px';
+            flyImg.style.width = '20px';
+            flyImg.style.height = '20px';
+            flyImg.style.opacity = 0.5;
+        }, 10);
+
+        flyImg.addEventListener('transitionend', () => {
+            flyImg.remove();
+        });
+    }
+    </script>
+}
+
+@section Styles {
+    <style>
+    /* Thêm style cho hiệu ứng bay */
+    .fly-img {
+        border-radius: 8px;
+        pointer-events: none;
+    }
+        /* Hiệu ứng di chuột cho cả 2 nút màu xanh */
+        .text-primary {
+            transition: all 0.2s ease-in-out;
+        }
+
+            .text-primary:hover {
+                color: #0a58ca !important; /* Xanh đậm hơn một chút khi hover */
+                opacity: 0.8;
+            }
+
+        /* Hiệu ứng rung nhẹ cho giỏ hàng khi hover */
+        .hover-effect:hover i {
+            transform: scale(1.1);
+        }
+
+        /* Đảm bảo Badge số lượng không bị lệch */
+        #cart-count {
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+    </style>
+}

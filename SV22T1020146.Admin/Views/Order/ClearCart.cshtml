@@ -1,0 +1,32 @@
+﻿@{
+    Layout = null;
+    int id = ViewBag.OrderID ?? 0;
+}
+
+<div class="modal-header text-bg-danger">
+    <strong class="modal-title">
+        Xóa giỏ hàng
+    </strong>
+    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+</div>
+
+<form method="post" action="~/Order/ClearCart">
+    <div class="modal-body">
+
+        <input type="hidden" name="id" value="@id" />
+
+        <div class="alert alert-danger">
+            Bạn có chắc chắn muốn xóa tất cả mặt hàng không?
+        </div>
+
+    </div>
+
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-danger">
+            <i class="bi bi-check"></i> Chấp nhận
+        </button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+            Đóng
+        </button>
+    </div>
+</form>

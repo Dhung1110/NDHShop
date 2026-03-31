@@ -1,0 +1,27 @@
+﻿@{
+    Layout = null;
+}
+
+<form method="get" action="~/Order/Reject/@ViewBag.OrderID">
+
+    <div class="modal-header text-bg-danger">
+        <strong class="modal-title">Xác nhận từ chối đơn hàng</strong>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+    </div>
+
+    <div class="modal-body">
+        <div class="alert alert-danger">
+            Bạn có thực sự muốn từ chối đơn hàng này không?
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-danger">
+            Chấp nhận
+        </button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+            Đóng
+        </button>
+    </div>
+
+</form>

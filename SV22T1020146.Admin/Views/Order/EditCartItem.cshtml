@@ -1,0 +1,48 @@
+﻿@model SV22T1020146.Models.Sales.OrderDetail
+@{
+    Layout = null;
+}
+
+<div class="modal-header text-bg-primary">
+    <strong class="modal-title">
+        <i class="bi bi-pencil-square me-2"></i> Cập nhật mặt hàng
+    </strong>
+    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+</div>
+
+<form method="post" action="~/Order/EditCartItem">
+    <div class="modal-body">
+        <input type="hidden" name="id" value="@Model.OrderID" />
+        <input type="hidden" name="productId" value="@Model.ProductID" />
+
+        <div class="mb-3 row">
+            <label class="col-sm-4 col-form-label">Sản phẩm</label>
+            <div class="col-sm-8">
+                <input type="text" class="form-control" value="@Model.ProductID" readonly />
+            </div>
+        </div>
+
+        <div class="mb-3 row">
+            <label class="col-sm-4 col-form-label">Số lượng</label>
+            <div class="col-sm-8">
+                <input type="number" class="form-control" name="quantity" value="@Model.Quantity" min="1" />
+            </div>
+        </div>
+
+        <div class="mb-3 row">
+            <label class="col-sm-4 col-form-label">Giá bán</label>
+            <div class="col-sm-8">
+                <input type="text" class="form-control" name="salePrice" value="@Model.SalePrice" />
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-check-circle me-1"></i> Cập nhật
+        </button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+            <i class="bi bi-x-circle me-1"></i> Đóng
+        </button>
+    </div>
+</form>

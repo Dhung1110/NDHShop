@@ -1,0 +1,142 @@
+﻿@model SV22T1020146.Shop.Models.LoginViewModel
+@{
+    ViewData["Title"] = "Đăng nhập";
+}
+
+<div class="auth-container">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-sm-10 col-md-7 col-lg-5 col-xl-5">
+                <div class="card auth-card">
+                    <div class="card-body p-4 p-md-5">
+
+                        <div class="text-center mb-5">
+                            <div class="d-inline-flex align-items-center justify-content-center bg-primary-subtle text-primary rounded-circle mb-4" style="width: 80px; height: 80px;">
+                                <i class="fa-solid fa-user-lock fs-2"></i>
+                            </div>
+                            <h2 class="fw-bold text-dark">Đăng nhập</h2>
+                            <p class="text-muted small">Chào mừng bạn quay trở lại với hệ thống</p>
+                        </div>
+
+                        <form asp-action="Login" method="post">
+                            <div class="mb-4">
+                                <label class="form-label small fw-bold text-muted ps-3">Tài khoản Email</label>
+                                <div class="input-group-custom d-flex align-items-center">
+                                    <i class="fa-solid fa-envelope text-muted"></i>
+                                    <input asp-for="Email" class="form-control" placeholder="name@example.com" />
+                                </div>
+                                <span asp-validation-for="Email" class="text-danger small ps-3"></span>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label small fw-bold text-muted ps-3">Mật khẩu</label>
+                                <div class="input-group-custom d-flex align-items-center">
+                                    <i class="fa-solid fa-key text-muted"></i>
+                                    <input asp-for="Password" type="password" class="form-control" id="passInput" placeholder="••••••••" />
+                                    <i class="fa-solid fa-eye text-muted cursor-pointer" onclick="togglePass('passInput', this)"></i>
+                                </div>
+                                <span asp-validation-for="Password" class="text-danger small ps-3"></span>
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center mb-4 px-2">
+                                <div class="form-check">
+                                    <input asp-for="RememberMe" class="form-check-input" type="checkbox">
+                                    <label class="form-check-label small text-muted">Lưu đăng nhập</label>
+                                </div>
+                                <a href="#" class="text-primary small text-decoration-none fw-bold">Quên mật khẩu?</a>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary btn-modern w-100 mb-4">
+                                ĐĂNG NHẬP NGAY
+                            </button>
+
+                            <div class="text-center">
+                                <p class="small text-muted">
+                                    Chưa có tài khoản?
+                                    <a asp-action="Register" class="text-primary fw-bold text-decoration-none">Đăng ký mới</a>
+                                </p>
+                                <hr class="my-4 opacity-25">
+                                <a asp-controller="Home" asp-action="Index" class="text-muted small text-decoration-none hover-primary">
+                                    <i class="fa-solid fa-house-chimney me-1"></i> Quay lại trang chủ
+                                </a>
+                            </div>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        function togglePass(id, icon) {
+            const input = document.getElementById(id);
+            if (input.type === "password") {
+                input.type = "text";
+                icon.classList.replace("fa-eye", "fa-eye-slash");
+            } else {
+                input.type = "password";
+                icon.classList.replace("fa-eye-slash", "fa-eye");
+            }
+        }
+    </script>
+}
+@section Styles {
+    <style>
+        /* CSS đồng bộ cho toàn bộ hệ thống Form */
+        .auth-container {
+            min-height: 80vh;
+            display: flex;
+            align-items: center;
+            padding: 40px 0;
+        }
+
+        .auth-card {
+            border: none;
+            border-radius: 24px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1) !important;
+            transition: transform 0.3s ease;
+        }
+
+        .input-group-custom {
+            border: 1px solid #e0e0e0;
+            border-radius: 50px;
+            background: #f8f9fa;
+            padding: 8px 20px;
+            transition: all 0.3s;
+        }
+
+            .input-group-custom:focus-within {
+                background: #fff;
+                border-color: #0d6efd;
+                box-shadow: 0 0 0 4px rgba(13, 110, 253, 0.1);
+            }
+
+            .input-group-custom input {
+                border: none !important;
+                background: transparent !important;
+                box-shadow: none !important;
+                padding: 10px;
+            }
+
+        .btn-modern {
+            background: linear-gradient(45deg, #0d6efd, #00d2ff);
+            border: none;
+            border-radius: 50px;
+            padding: 14px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            transition: all 0.3s;
+        }
+
+            .btn-modern:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 8px 20px rgba(13, 110, 253, 0.3);
+                color: white;
+            }
+    </style>
+
+}

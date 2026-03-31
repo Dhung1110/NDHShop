@@ -1,0 +1,212 @@
+﻿@model List<SV22T1020146.Models.Sales.OrderDetailViewInfo>
+
+@{
+    ViewData["Title"] = "Giỏ hàng của bạn";
+    decimal total = 0;
+}
+
+
+<div class="container py-5">
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="cart-card p-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h4 class="fw-bold mb-0">Giỏ hàng <span class="text-muted fw-normal">(@(Model?.Count ?? 0) sản phẩm)</span></h4>
+                    @if (Model?.Count > 0)
+                    {
+                        <a asp-action="ClearCart" class="text-danger small text-decoration-none fw-bold" onclick="return confirm('Xóa sạch giỏ hàng?')">
+                            <i class="fa-solid fa-trash-can me-1"></i> XÓA TẤT CẢ
+                        </a>
+                    }
+                </div>
+
+                @if (Model == null || Model.Count == 0)
+                {
+                    <div class="text-center py-5">
+                        <i class="fa-solid fa-cart-shopping fa-3x text-light mb-3"></i>
+                        <p class="text-muted">Giỏ hàng của bạn đang trống.</p>
+                        <a href="/Product" class="btn btn-primary rounded-pill px-4">Tiếp tục mua sắm</a>
+                    </div>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                        <table class="table align-middle">
+                            <thead>
+                                <tr class="text-muted">
+                                    <th>Sản phẩm</th>
+                                    <th class="text-center">Đơn giá</th>
+                                    <th class="text-center">Số lượng</th>
+                                    <th class="text-end">Thành tiền</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model)
+                                {
+                                    var money = item.Quantity * item.SalePrice;
+                                    total += money;
+
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <img src="@item.Photo" class="product-img me-3 border shadow-sm">
+                                                <div>
+                                                    <h6 class="mb-0 fw-bold">@item.ProductName</h6>
+                                                    <small class="text-muted">Mã SP: @item.ProductID</small>
+                                                </div>
+                                            </div>
+                                        </td>
+
+                                        <td class="text-center">@item.SalePrice.ToString("N0")₫</td>
+
+                                        <td class="text-center">
+                                            <form asp-action="UpdateQuantity" method="post" class="d-flex justify-content-center">
+                                                <input type="hidden" name="productId" value="@item.ProductID" />
+                                                <div class="quantity-control shadow-sm">
+                                                    <button type="button" class="quantity-btn" onclick="this.parentNode.querySelector('input').stepDown(); this.form.submit();">
+                                                        <i class="fa-solid fa-minus text-muted small"></i>
+                                                    </button>
+                                                    <input type="number" name="quantity" value="@item.Quantity" min="1"
+                                                           onchange="this.form.submit()" class="quantity-input">
+                                                    <button type="button" class="quantity-btn" onclick="this.parentNode.querySelector('input').stepUp(); this.form.submit();">
+                                                        <i class="fa-solid fa-plus text-muted small"></i>
+                                                    </button>
+                                                </div>
+                                            </form>
+                                        </td>
+
+                                        <td class="text-end fw-bold text-dark">
+                                            @money.ToString("N0")₫
+                                        </td>
+
+                                        <td class="text-end">
+                                            <a asp-action="RemoveFromCart" asp-route-productId="@item.ProductID"
+                                               class="btn btn-light btn-sm rounded-circle text-danger p-2 shadow-sm">
+                                                <i class="fa-solid fa-xmark"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="summary-card p-4 shadow-sm">
+                <h5 class="fw-bold mb-4">Tổng kết đơn hàng</h5>
+                <div class="d-flex justify-content-between mb-3 text-muted">
+                    <span>Tạm tính:</span>
+                    <span>@total.ToString("N0")₫</span>
+                </div>
+                <div class="d-flex justify-content-between mb-4 text-muted">
+                    <span>Phí vận chuyển:</span>
+                    <span class="text-success small fw-bold">Miễn phí</span>
+                </div>
+                <hr class="border-light">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <span class="fw-bold">Tổng cộng:</span>
+                    <span class="fw-bold text-primary fs-3">@total.ToString("N0")₫</span>
+                </div>
+
+                <a href="/Order/Checkout" class="btn btn-checkout btn-primary w-100 mb-3 shadow">
+                    TIẾN HÀNH ĐẶT HÀNG
+                </a>
+
+                <div class="p-3 bg-light rounded-3">
+                    <small class="text-muted d-block"><i class="fa-solid fa-shield-halved me-2"></i> Cam kết bảo mật thanh toán</small>
+                    <small class="text-muted d-block mt-2"><i class="fa-solid fa-rotate me-2"></i> Đổi trả dễ dàng trong 7 ngày</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section Styles{
+    <style>
+        /* Tổng thể giỏ hàng */
+        .cart-card {
+            border: none;
+            border-radius: 20px;
+            background: #fff;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        }
+
+        .table thead th {
+            border-top: none;
+            background-color: #f8f9fa;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 1px;
+            padding: 15px;
+        }
+
+        .product-img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 15px;
+        }
+
+        /* Bộ tăng giảm số lượng */
+        .quantity-control {
+            display: flex;
+            align-items: center;
+            background: #f1f3f5;
+            border-radius: 10px;
+            width: fit-content;
+            padding: 2px;
+        }
+
+        .quantity-btn {
+            background: none;
+            border: none;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.2s;
+            border-radius: 8px;
+        }
+
+            .quantity-btn:hover {
+                background: #dee2e6;
+            }
+
+        .quantity-input {
+            width: 45px;
+            border: none;
+            background: transparent;
+            text-align: center;
+            font-weight: bold;
+        }
+        /* Ẩn mũi tên mặc định của input number */
+        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Khối tổng tiền */
+        .summary-card {
+            background: #fff;
+            border-radius: 20px;
+            border: 2px solid #f8f9fa;
+        }
+
+        .btn-checkout {
+            background: #0d6efd;
+            border-radius: 12px;
+            padding: 12px;
+            font-weight: 700;
+            transition: 0.3s;
+        }
+
+            .btn-checkout:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 8px 20px rgba(13, 110, 253, 0.2);
+            }
+    </style>
+}

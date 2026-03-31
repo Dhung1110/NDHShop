@@ -1,0 +1,246 @@
+﻿@model SV22T1020146.Models.Catalog.Product
+
+@{
+    ViewData["Title"] = "Chi tiết sản phẩm";
+    var photos = ViewBag.Photos as List<SV22T1020146.Models.Catalog.ProductPhoto>;
+    var attributes = ViewBag.Attributes as List<SV22T1020146.Models.Catalog.ProductAttribute>;
+}
+
+<div class="container py-5">
+    <div class="product-detail-container">
+        <div class="mb-4">
+            <a href="@Url.Action("Index", "Product")" class="text-decoration-none text-muted fw-bold small text-uppercase">
+                <i class="fa-solid fa-arrow-left me-1"></i> Quay lại cửa hàng
+            </a>
+        </div>
+
+        <div class="row g-5">
+            <div class="col-lg-6">
+                <div class="main-img-wrapper">
+                    @if (photos != null && photos.Count > 0)
+                    {
+                        <img id="mainImg" src="@photos[0].Photo" alt="@Model.ProductName" />
+                    }
+                    else
+                    {
+                        <img id="mainImg" src="~/images/no-image.png" alt="No image" />
+                    }
+                </div>
+
+                @if (photos != null && photos.Count > 1)
+                {
+                    <div class="d-flex gap-2 flex-wrap">
+                        @foreach (var p in photos)
+                        {
+                            <img src="@p.Photo"
+                                 class="thumb-img border"
+                                 onclick="changeImage(this)" />
+                        }
+                    </div>
+                }
+            </div>
+
+            <div class="col-lg-6">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-2">
+                        <li class="breadcrumb-item"><a href="/" class="text-decoration-none">Trang chủ</a></li>
+                        <li class="breadcrumb-item active">Chi tiết</li>
+                    </ol>
+                </nav>
+
+                <h1 class="product-name">@Model.ProductName</h1>
+
+                <div class="price-tag">@Model.Price.ToString("N0") đ</div>
+
+                <div class="product-meta mt-2">
+                    <p class="mb-2"><span class="info-label">Đơn vị:</span> <span class="badge bg-light text-dark border">@Model.Unit</span></p>
+                    <p class="mb-4">
+                        <span class="info-label">Trạng thái:</span>
+                        @if (Model.IsSelling)
+                        {
+                            <span class="text-success fw-bold"><i class="fa-solid fa-circle-check me-1"></i> Đang bán</span>
+                        }
+                        else
+                        {
+                            <span class="text-danger fw-bold"><i class="fa-solid fa-circle-xmark me-1"></i> Ngừng bán</span>
+                        }
+                    </p>
+                </div>
+
+                <div class="action-buttons d-flex gap-3 mt-4">
+                    <button class="btn btn-buy btn-lg"
+                            onclick="addToCart(@Model.ProductID)">
+                        <i class="fa-solid fa-cart-plus me-2"></i> THÊM VÀO GIỎ HÀNG
+                    </button>
+                    <button class="btn btn-outline-secondary btn-lg rounded-4 px-4">
+                        <i class="fa-regular fa-heart"></i>
+                    </button>
+                </div>
+
+                <div class="mt-4 p-3 border rounded-4 bg-light d-flex align-items-center gap-3">
+                    <i class="fa-solid fa-truck-fast text-primary fs-3"></i>
+                    <div>
+                        <span class="d-block fw-bold small">Giao hàng miễn phí</span>
+                        <span class="text-muted small">Cho đơn hàng trên 500.000đ tại TP. Huế</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @if (attributes != null && attributes.Count > 0)
+        {
+            <div class="mt-5 pt-5 border-top">
+                <h4 class="fw-bold mb-4"><i class="fa-solid fa-list-ul me-2 text-primary"></i>Thông số sản phẩm</h4>
+                <div class="table-responsive">
+                    <table class="table table-hover spec-table">
+                        <tbody>
+                            @foreach (var a in attributes)
+                            {
+                                <tr>
+                                    <th style="width: 30%;" class="ps-4 py-3">@a.AttributeName</th>
+                                    <td class="ps-4 py-3 text-dark">@a.AttributeValue</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+@section Scripts{
+<script>
+    function changeImage(element) {
+        // Thay đổi ảnh chính
+        document.getElementById('mainImg').src = element.src;
+
+        // Cập nhật class active cho border
+        var thumbnails = document.querySelectorAll('.thumb-img');
+        thumbnails.forEach(img => img.classList.remove('active'));
+        element.classList.add('active');
+    }
+    function addToCart(productId) {
+        fetch(`/Cart/AddToCart?productId=${productId}&quantity=1`)
+            .then(res => {
+                if (res.ok) {
+                    alert("✅ Đã thêm vào giỏ hàng");
+                    updateCartCount();
+                } else {
+                    alert("❌ Lỗi thêm giỏ hàng");
+                }
+            });
+    }
+
+    function updateCartCount() {
+        fetch('/Cart/GetCount')
+            .then(res => res.text())
+            .then(count => {
+                let badge = document.getElementById("cart-count");
+                if (badge) badge.innerText = count;
+            });
+    }
+</script>
+}
+@section Styles{
+    <style>
+        /* Tổng thể */
+        .product-detail-container {
+            background: #fff;
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.03);
+        }
+
+        /* Gallery Ảnh */
+        .main-img-wrapper {
+            background: #f8f9fa;
+            border-radius: 20px;
+            overflow: hidden;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            aspect-ratio: 1/1;
+            border: 1px solid #eee;
+        }
+
+        #mainImg {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            transition: 0.3s;
+        }
+
+        .thumb-img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 12px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: 0.2s;
+        }
+
+            .thumb-img:hover, .thumb-img.active {
+                border-color: #0d6efd;
+                transform: translateY(-2px);
+            }
+
+        /* Thông tin */
+        .product-name {
+            font-weight: 800;
+            font-size: 2rem;
+            color: #2d3436;
+            margin-bottom: 15px;
+        }
+
+        .price-tag {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #0d6efd;
+            background: #f0f7ff;
+            display: inline-block;
+            padding: 5px 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: #636e72;
+            width: 120px;
+            display: inline-block;
+        }
+
+        /* Nút bấm */
+        .btn-buy {
+            background: #0d6efd;
+            color: white;
+            padding: 12px 35px;
+            border-radius: 15px;
+            font-weight: 700;
+            border: none;
+            transition: 0.3s;
+            box-shadow: 0 4px 15px rgba(13, 110, 253, 0.2);
+        }
+
+            .btn-buy:hover {
+                background: #0b5ed7;
+                transform: translateY(-2px);
+                box-shadow: 0 6px 20px rgba(13, 110, 253, 0.3);
+            }
+
+        /* Bảng thông số */
+        .spec-table {
+            border-radius: 15px;
+            overflow: hidden;
+            border: 1px solid #f0f0f0;
+        }
+
+            .spec-table th {
+                background: #f8f9fa;
+                color: #636e72;
+                font-weight: 600;
+            }
+    </style>
+}

@@ -1,0 +1,25 @@
+﻿@model SV22T1020146.Models.Sales.OrderDetailViewInfo
+@{
+    Layout = null;
+}
+
+<form method="post" action="~/Order/EditOrderItem">
+
+    <input type="hidden" name="OrderID" value="@Model.OrderID" />
+    <input type="hidden" name="ProductID" value="@Model.ProductID" />
+
+    <div class="modal-header">
+        <h5 class="modal-title">Sửa mặt hàng</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+    </div>
+
+    <div class="modal-body">
+        <label>Số lượng</label>
+        <input type="number" name="Quantity" value="@Model.Quantity" class="form-control" min="1" />
+    </div>
+
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Lưu</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+    </div>
+</form>

@@ -1,0 +1,160 @@
+﻿@model SV22T1020146.Shop.Models.ProfileViewModel
+@{
+    ViewData["Title"] = "Hồ sơ cá nhân";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card profile-card shadow-lg border-0">
+                <div class="row g-0">
+                    <div class="col-md-4 bg-primary p-5 text-white text-center d-flex flex-column align-items-center justify-content-center">
+                        <div class="avatar-wrapper rounded-circle d-flex align-items-center justify-content-center text-primary fw-bold mb-3">
+                            @(string.IsNullOrEmpty(Model.CustomerName) ? "U" : Model.CustomerName.Substring(0, 1).ToUpper())
+                        </div>
+                        <h4 class="fw-bold mb-1">@User.Identity.Name</h4>
+                        <p class="small opacity-75 mb-4">Khách hàng thành viên</p>
+
+                        <div class="w-100 pt-3 border-top border-white border-opacity-25">
+                            <div class="d-flex justify-content-between mb-2 small">
+                                <span>Trạng thái:</span>
+                                <span class="badge bg-success">Đang hoạt động</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-8 p-4 p-md-5 bg-white">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h3 class="fw-bold text-dark m-0">Thông tin cá nhân</h3>
+                            <i class="fa-solid fa-user-gear text-muted fs-4"></i>
+                        </div>
+
+                        @if (ViewBag.Message != null)
+                        {
+                            <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
+                                <i class="fa-solid fa-circle-check me-2"></i> @ViewBag.Message
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        }
+
+                        <form asp-action="Profile" method="post">
+                            <div class="row g-4">
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold">Họ và tên</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fa-solid fa-id-card"></i></span>
+                                        <input asp-for="CustomerName" class="form-control" placeholder="Nhập họ tên..." />
+                                    </div>
+                                    <span asp-validation-for="CustomerName" class="text-danger x-small"></span>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold">Tên liên hệ</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fa-solid fa-user-tag"></i></span>
+                                        <input asp-for="ContactName" class="form-control" />
+                                    </div>
+                                    <span asp-validation-for="ContactName" class="text-danger x-small"></span>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold">Số điện thoại</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fa-solid fa-phone"></i></span>
+                                        <input asp-for="Phone" class="form-control" />
+                                    </div>
+                                    <span asp-validation-for="Phone" class="text-danger x-small"></span>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold">Email cá nhân</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fa-solid fa-envelope"></i></span>
+                                        <input asp-for="Email" class="form-control" />
+                                    </div>
+                                    <span asp-validation-for="Email" class="text-danger x-small"></span>
+                                </div>
+
+                                <div class="col-md-12">
+                                    <label class="form-label small fw-bold">Tỉnh / Thành phố</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fa-solid fa-map-location-dot"></i></span>
+                                        <select asp-for="Province" asp-items="ViewBag.Provinces" class="form-select"></select>
+                                    </div>
+                                    <span asp-validation-for="Province" class="text-danger x-small"></span>
+                                </div>
+
+                                <div class="col-md-12">
+                                    <label class="form-label small fw-bold">Địa chỉ chi tiết</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fa-solid fa-house-chimney"></i></span>
+                                        <input asp-for="Address" class="form-control" />
+                                    </div>
+                                    <span asp-validation-for="Address" class="text-danger x-small"></span>
+                                </div>
+
+                                <div class="col-12 text-end mt-5">
+                                    <a asp-controller="Home" asp-action="Index" class="btn btn-light rounded-pill px-4 me-2">Quay lại</a>
+                                    <button type="submit" class="btn btn-primary btn-update rounded-pill px-5 fw-bold text-white">
+                                        Lưu thay đổi
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+@section Styles {
+<style>
+    .profile-card {
+        border-radius: 15px;
+        overflow: hidden;
+        transition: all 0.3s;
+    }
+
+    .avatar-wrapper {
+        width: 110px;
+        height: 110px;
+        background: #f8f9fa;
+        border: 4px solid #fff;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        font-size: 2.5rem;
+        position: relative;
+    }
+
+    .form-control, .form-select {
+        border-radius: 8px;
+        padding: 10px 15px;
+        border: 1px solid #dee2e6;
+    }
+
+        .form-control:focus {
+            border-color: #0d6efd;
+            box-shadow: 0 0 0 0.25 red rgba(13, 110, 253, 0.1);
+        }
+
+    .input-group-text {
+        background-color: #f8f9fa;
+        border-radius: 8px 0 0 8px;
+        color: #6c757d;
+    }
+
+    .btn-update {
+        background: linear-gradient(45deg, #0d6efd, #00d2ff);
+        border: none;
+        transition: transform 0.2s;
+    }
+
+        .btn-update:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(13,110,253,0.3);
+        }
+</style>
+}

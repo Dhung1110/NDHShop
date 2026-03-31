@@ -1,0 +1,284 @@
+﻿@model PagedResult<Product>
+
+@{
+    ViewData["Title"] = "Danh mục sản phẩm";
+    var searchValue = Context.Request.Query["SearchValue"];
+    var categoryId = Context.Request.Query["CategoryID"];
+    var minPrice = Context.Request.Query["MinPrice"];
+    var maxPrice = Context.Request.Query["MaxPrice"];
+}
+
+<div class="container py-5">
+
+    <div class="filter-wrapper">
+        <form method="get" action="@Url.Action("Search", "Product")" class="row g-3 align-items-end">
+            <input type="hidden" name="Page" value="1" />
+
+            <div class="col-lg-4 col-md-6">
+                <label class="form-label small fw-bold text-muted ms-2">Tên sản phẩm</label>
+                <input type="text" name="SearchValue" value="@searchValue" class="form-control rounded-pill px-3 shadow-sm" placeholder="Tìm theo tên hàng...">
+            </div>
+
+            <div class="col-lg-2 col-md-6">
+                <label class="form-label small fw-bold text-muted ms-2">Loại hàng</label>
+                <select name="CategoryID" class="form-select rounded-pill shadow-sm">
+                    <option value="0">Tất cả</option>
+                    @foreach (var c in ViewBag.Categories)
+                    {
+                        <option value="@c.CategoryID" selected="@(categoryId == c.CategoryID.ToString())">@c.CategoryName</option>
+                    }
+                </select>
+            </div>
+
+            <div class="col-lg-4 col-md-8">
+                <label class="form-label small fw-bold text-muted ms-2">Khoảng giá (VNĐ)</label>
+                <div class="d-flex gap-2 align-items-center">
+                    <input type="number" name="MinPrice" value="@minPrice" class="form-control rounded-pill shadow-sm" placeholder="Từ">
+                    <span class="text-muted">-</span>
+                    <input type="number" name="MaxPrice" value="@maxPrice" class="form-control rounded-pill shadow-sm" placeholder="Đến">
+                </div>
+            </div>
+
+            <div class="col-lg-2 col-md-4">
+                <button type="submit" class="btn btn-primary w-100 rounded-pill fw-bold py-2 shadow">
+                    <i class="fa-solid fa-magnifying-glass me-2"></i>TÌM KIẾM
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <div class="row g-4 mb-5">
+        @if (Model.DataItems != null && Model.DataItems.Any())
+        {
+            foreach (var p in Model.DataItems)
+            {
+                <div class="col-xl-3 col-lg-4 col-md-6">
+                    <div class="card h-100 product-card shadow-sm">
+                        <div class="img-container">
+                            <img src="@(string.IsNullOrEmpty(p.Photo) ? "/images/no-image.png" : p.Photo)"
+                                 class="card-img-top img-fluid"
+                                 alt="@p.ProductName">
+                            <div class="position-absolute top-0 start-0 m-3">
+                                <span class="badge badge-discount px-2 py-1 shadow-sm">-20%</span>
+                            </div>
+                        </div>
+
+                        <div class="card-body px-4 pt-3">
+                            <small class="text-uppercase text-muted fw-bold" style="font-size: 0.65rem;">CÔNG NGHỆ</small>
+                            <h6 class="card-title fw-bold my-2 text-dark text-truncate" title="@p.ProductName">@p.ProductName</h6>
+
+                            <div class="d-flex justify-content-between align-items-center mt-3">
+                                <span class="text-primary fw-bold fs-5">@p.Price.ToString("N0")đ</span>
+                                <div class="text-warning small">
+                                    @for (int s = 0; s < 5; s++)
+                                    {
+                                        <i class="fa-solid fa-star"></i>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card-footer bg-transparent border-0 pb-4 px-4">
+                            <div class="row g-2">
+                                <div class="col-5">
+                                    <a href="@Url.Action("Details", new { id = p.ProductID })" class="btn btn-detail w-100 py-2">Chi tiết</a>
+                                </div>
+                                <div class="col-7">
+                                    <button class="btn btn-add-cart w-100 py-2"
+                                            onclick="addToCart(@p.ProductID)">
+                                        <i class="fa-solid fa-cart-shopping me-1"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="col-12 text-center py-5">
+                <p class="text-muted">Không tìm thấy sản phẩm nào phù hợp với yêu cầu của bạn.</p>
+            </div>
+        }
+    </div>
+
+    @if (Model.PageCount > 1)
+    {
+        <div class="d-flex justify-content-center mt-5">
+            <ul class="pagination d-flex align-items-center gap-1 list-unstyled">
+
+                @* Prev *@
+                <li class="page-item @(Model.Page <= 1 ? "disabled" : "")">
+                    <a class="pagination-link shadow-sm" href="@(Model.Page > 1 ? Url.Action("Search", new { Page = Model.Page - 1, SearchValue = searchValue, CategoryID = categoryId, MinPrice = minPrice, MaxPrice = maxPrice }) : "#")">
+                        <i class="fa-solid fa-chevron-left small text-muted"></i>
+                    </a>
+                </li>
+
+                @{
+                    int delta = 2;
+                    int left = Model.Page - delta;
+                    int right = Model.Page + delta;
+                }
+
+                @for (int i = 1; i <= Model.PageCount; i++)
+                {
+                    if (i == 1 || i == Model.PageCount || (i >= left && i <= right))
+                    {
+                        <li class="page-item">
+                            <a class="pagination-link @(i == Model.Page ? "active-page shadow" : "shadow-sm")"
+                               href="@Url.Action("Search", new { Page = i, SearchValue = searchValue, CategoryID = categoryId, MinPrice = minPrice, MaxPrice = maxPrice })">
+                                @i
+                            </a>
+                        </li>
+                    }
+                    else if (i == left - 1 || i == right + 1)
+                    {
+                        <li class="page-item"><span class="pagination-link no-hover border-0 text-muted">...</span></li>
+                    }
+                }
+
+                @* Next *@
+                <li class="page-item @(Model.Page >= Model.PageCount ? "disabled" : "")">
+                    <a class="pagination-link shadow-sm" href="@(Model.Page<Model.PageCount? Url.Action("Search", new { Page = Model.Page + 1, SearchValue = searchValue, CategoryID = categoryId, MinPrice = minPrice, MaxPrice = maxPrice }) : "#")">
+                        <i class="fa-solid fa-chevron-right small text-muted"></i>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    }
+</div>
+@section Scripts{
+    <script>
+        function addToCart(productId) {
+            fetch(`/Cart/AddToCart?productId=${productId}&quantity=1`)
+                .then(res => {
+                    if (res.ok) {
+                        alert("✅ Đã thêm vào giỏ hàng");
+
+                        // 👉 cập nhật badge giỏ hàng nếu có
+                        updateCartCount();
+                    } else {
+                        alert("❌ Lỗi thêm giỏ hàng");
+                    }
+                });
+        }
+
+        // (OPTION) cập nhật số lượng giỏ hàng
+        function updateCartCount() {
+            fetch('/Cart/GetCount')
+                .then(res => res.text())
+                .then(count => {
+                    document.getElementById("cart-count").innerText = count;
+                });
+        }
+    </script>
+}
+@section Styles{
+    <style>
+        /* 1. Bộ lọc (Filter) */
+        .filter-wrapper {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            margin-bottom: 40px;
+            border: 1px solid #f0f0f0;
+        }
+
+        /* 2. Card Sản phẩm */
+        .product-card {
+            border: none;
+            border-radius: 20px;
+            transition: all 0.3s cubic-bezier(.25,.8,.25,1);
+            background: #fff;
+            overflow: hidden;
+        }
+
+            .product-card:hover {
+                transform: translateY(-8px);
+                box-shadow: 0 15px 35px rgba(0,0,0,0.1) !important;
+            }
+
+        .img-container {
+            position: relative;
+            background: #f8f9fa;
+            aspect-ratio: 4/3;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .badge-discount {
+            background: rgba(255, 255, 255, 0.9);
+            color: #666;
+            font-weight: bold;
+            border-radius: 8px;
+            font-size: 0.75rem;
+        }
+
+        /* 3. Nút bấm */
+        .btn-detail {
+            border-radius: 12px;
+            font-weight: 600;
+            border: 1px solid #dee2e6;
+            color: #495057;
+            transition: 0.3s;
+        }
+
+            .btn-detail:hover {
+                background: #f8f9fa;
+                border-color: #0d6efd;
+                color: #0d6efd;
+            }
+
+        .btn-add-cart {
+            background: #0d6efd;
+            color: white;
+            border-radius: 12px;
+            padding: 10px;
+            font-weight: 600;
+            border: none;
+            transition: 0.3s;
+        }
+
+            .btn-add-cart:hover {
+                background: #0b5ed7;
+                box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
+            }
+
+        /* 4. Phân trang (Pagination) giống hình mẫu */
+        .pagination-link {
+            width: 42px;
+            height: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            font-size: 0.9rem;
+            border: 1px solid #eee;
+            background: #fff;
+            color: #333;
+        }
+
+            .pagination-link:hover:not(.active-page):not(.no-hover) {
+                border-color: #0d6efd;
+                color: #0d6efd;
+                background: #f0f7ff;
+            }
+
+        .active-page {
+            background-color: #0d6efd !important;
+            border-color: #0d6efd !important;
+            color: white !important;
+        }
+
+        .page-item.disabled .pagination-link {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+    </style>
+}

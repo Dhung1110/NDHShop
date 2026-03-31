@@ -1,0 +1,65 @@
+﻿@model SV22T1020146.Models.Partner.Shipper
+
+@{
+    ViewBag.Title = "Xóa người giao hàng";
+}
+
+@section PageToolBar {
+    @if (ViewBag.AllowDelete)
+    {
+        <button type="submit" form="formDelete" class="btn btn-danger">
+            <i class="bi bi-trash me-1"></i>
+            Xóa
+        </button>
+    }
+
+    <a href="~/Shipper" class="btn btn-secondary ms-1">
+        <i class="bi bi-arrow-left"></i>
+        Quay lại
+    </a>
+}
+
+<div class="row justify-content-center">
+    <div class="col-12">
+        <div class="card card-danger card-outline">
+            <div class="card-header">
+                <h5 class="card-title mb-0 text-danger">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    Xác nhận xóa người giao hàng
+                </h5>
+            </div>
+
+            <div class="card-body">
+                <form id="formDelete" method="post">
+
+                    <!-- ID -->
+                    <input type="hidden" asp-for="ShipperID" />
+
+                    <!-- THÔNG BÁO -->
+                    @if (ViewBag.AllowDelete)
+                    {
+                        <div class="alert alert-warning">
+                            Bạn có chắc chắn muốn xóa người giao hàng này không?
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-danger">
+                            Người giao hàng này đang được sử dụng trong đơn hàng. Không thể xóa!
+                        </div>
+                    }
+
+                    <!-- THÔNG TIN -->
+                    <dl class="row mb-0">
+                        <dt class="col-sm-4">Tên người giao hàng</dt>
+                        <dd class="col-sm-8">@Model.ShipperName</dd>
+
+                        <dt class="col-sm-4">Điện thoại</dt>
+                        <dd class="col-sm-8">@Model.Phone</dd>
+                    </dl>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

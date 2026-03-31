@@ -1,0 +1,34 @@
+﻿@model OrderDetail
+@{
+    Layout = null;
+}
+
+<div class="modal-header text-bg-danger">
+    <strong class="modal-title">
+        <i class="bi bi-trash me-2"></i> Xóa mặt hàng
+    </strong>
+    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+</div>
+
+<form method="post" action="~/Order/DeleteCartItem">
+    <div class="modal-body">
+        <input type="hidden" name="id" value="@Model.OrderID" />
+        <input type="hidden" name="productId" value="@Model.ProductID" />
+        <input type="hidden" name="confirm" value="yes" />
+
+        <div class="alert alert-danger">
+            Bạn có chắc chắn muốn xóa mặt hàng
+            <strong class="text-primary">@Model.ProductID</strong>
+            khỏi danh sách không?
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-danger">
+            <i class="bi bi-check"></i> Chấp nhận
+        </button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+            Đóng
+        </button>
+    </div>
+</form>

@@ -1,0 +1,166 @@
+﻿@model PaginationSearchInput
+@{
+    ViewBag.Title = "Lập đơn hàng";
+    var details = ViewBag.Details as List<OrderDetailViewInfo> ?? new List<OrderDetailViewInfo>();
+    decimal sum = 0;
+    int i = 1;
+}
+
+<div class="row">
+    <div class="col-4">
+        <div class="card card-outline card-primary h-100">
+            <div class="card-header"><h5 class="mb-0"><i class="bi bi-search"></i> Lựa chọn hàng</h5></div>
+            <div class="card-body">
+                <form id="formSearchProduct" method="get" action="~/Order/SearchProduct" data-target="productSearchResult" onsubmit="paginationSearch(event, this, 1)">
+                    <input type="hidden" name="PageSize" value="@Model.PageSize" />
+                    <div class="input-group mb-3">
+                        <input type="text" name="SearchValue" value="@Model.SearchValue" class="form-control" placeholder="Tên mặt hàng..." autofocus />
+                        <button class="btn btn-primary"><i class="bi bi-search"></i></button>
+                    </div>
+                </form>
+                <div id="productSearchResult"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-8">
+        <div class="card card-outline card-success">
+            <div class="card-header"><h5 class="mb-0"><i class="bi bi-cart"></i> Danh sách mặt hàng</h5></div>
+            <div class="card-body">
+                <table class="table table-bordered table-hover align-middle">
+                    <thead class="table-success">
+                        <tr>
+                            <th style="width:5%;">#</th>
+                            <th style="width:35%;">Tên hàng</th>
+                            <th class="text-center">SL</th>
+                            <th class="text-end">Giá</th>
+                            <th class="text-end">Thành tiền</th>
+                            <th style="width:15%;"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in details)
+                        {
+                            var total = item.Quantity * item.SalePrice;
+                            sum += total;
+                            <tr>
+                                <td>@i</td>
+                                <td>@item.ProductName</td>
+                                <td class="text-center">@item.Quantity</td>
+                                <td class="text-end">@item.SalePrice.ToString("N0")</td>
+                                <td class="text-end">@total.ToString("N0")</td>
+                                <td class="text-end">
+                                    <a href="~/Order/EditCartItem?productId=@item.ProductID" class="btn btn-sm btn-primary open-modal"><i class="bi bi-pencil"></i></a>
+                                    <a href="~/Order/DeleteCartItem?productId=@item.ProductID" class="btn btn-sm btn-danger open-modal"><i class="bi bi-trash"></i></a>
+                                </td>
+                            </tr>
+                            i++;
+                        }
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th colspan="4" class="text-end">Tổng cộng:</th>
+                            <th class="text-end text-danger">@sum.ToString("N0") đ</th>
+                            <th></th>
+                        </tr>
+                    </tfoot>
+                </table>
+                <div class="text-end mt-2">
+                    <a class="btn btn-sm btn-outline-danger open-modal" href="~/Order/ClearCart">Xóa giỏ hàng</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="card card-outline card-info mt-3">
+            <div class="card-header"><h5><i class="bi bi-person"></i> Thông tin giao hàng</h5></div>
+            <div class="card-body">
+                <form id="formCreateOrder" action="/Order/CreateOrder" method="post">
+                    <div class="row mb-3">
+                        <label class="col-md-3">Khách hàng</label>
+                        <div class="col-md-9">
+                            <select class="form-select" name="customerID">
+                                <option value="0">-- Tên khách hàng --</option>
+                                @foreach (var c in ViewBag.Customers)
+                                {
+                                    <option value="@c.CustomerID"
+                                            selected="@(c.CustomerID == (int)ViewBag.SelectedCustomerID)">
+                                        @c.CustomerName
+                                    </option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label class="col-md-3">Tỉnh/thành</label>
+                        <div class="col-md-9">
+                            <select class="form-select" name="province">
+                                <option value="">-- Tỉnh/thành --</option>
+                                @foreach (var p in ViewBag.Provinces)
+                                {
+                                    <option value="@p.ProvinceName"
+                                            selected="@(p.ProvinceName == (string)ViewBag.SelectedProvince)">
+                                        @p.ProvinceName
+                                    </option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label class="col-md-3">Địa chỉ</label>
+                        <div class="col-md-9">
+                            <textarea class="form-control" name="address" rows="2">@ViewBag.SelectedAddress</textarea>
+                        </div>
+                    </div>
+                    <div class="text-end">
+                        <button type="submit" class="btn btn-primary">Xác nhận lập đơn hàng</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('formCreateOrder').addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        // CÁCH SỬA MỚI: Dùng URLSearchParams để đảm bảo mapping chuẩn
+        const formData = new FormData(this);
+        const data = new URLSearchParams(formData);
+
+        fetch(this.action, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: data.toString()
+        })
+        .then(res => res.json())
+        .then(result => {
+            if (result.code > 0) {
+                window.location.href = '/Order/Detail/' + result.code;
+            } else {
+                alert(result.message);
+            }
+        })
+        .catch(err => alert('Lỗi kết nối server!'));
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+        paginationSearch(null, document.getElementById("formSearchProduct"), @Model.Page);
+    });
+        function saveOrderInfo() {
+        const customerID = document.querySelector('[name="customerID"]').value;
+        const province = document.querySelector('[name="province"]').value;
+        const address = document.querySelector('[name="address"]').value;
+
+        fetch('/Order/SaveOrderInfo', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `customerID=${customerID}&province=${province}&address=${address}`
+        });
+    }
+
+    // Gắn sự kiện
+    document.querySelector('[name="customerID"]').addEventListener('change', saveOrderInfo);
+    document.querySelector('[name="province"]').addEventListener('change', saveOrderInfo);
+    document.querySelector('[name="address"]').addEventListener('input', saveOrderInfo);
+</script>

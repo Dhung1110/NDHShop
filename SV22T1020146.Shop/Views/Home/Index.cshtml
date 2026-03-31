@@ -1,0 +1,69 @@
+﻿@{
+    ViewData["Title"] = "NDH Shop";
+}
+
+<div class="container-fluid mb-5 p-0">
+    <div class="position-relative overflow-hidden p-3 p-md-5 text-center bg-dark text-white"
+         style="background: var(--primary-gradient) !important; border-radius: 0 0 50px 50px;">
+        <div class="col-md-6 p-lg-5 mx-auto my-5">
+            <h1 class="display-3 fw-bold">Trải Nghiệm Mua Sắm 4.0</h1>
+            <p class="lead fw-normal">Sở hữu những thiết bị công nghệ hàng đầu với mức giá ưu đãi nhất mùa hè này.</p>
+            <a class="btn btn-light btn-lg rounded-pill px-5 fw-bold text-primary shadow" href="#">Khám phá ngay</a>
+        </div>
+        <div class="product-device shadow-sm d-none d-md-block"></div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold">Sản phẩm mới nhất</h2>
+        <div class="dropdown">
+            <button class="btn btn-outline-secondary dropdown-toggle rounded-pill" type="button" data-bs-toggle="dropdown">
+                Lọc theo giá
+            </button>
+            <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="#">Giá thấp đến cao</a></li>
+                <li><a class="dropdown-item" href="#">Giá cao đến thấp</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+        @for (int i = 1; i <= 8; i++)
+        {
+            <div class="col">
+                <div class="card h-100 product-card shadow-sm">
+                    <div class="img-container text-center">
+                        <img src="https://picsum.photos/400/300?random=@i" class="card-img-top img-fluid" alt="Sản phẩm @i">
+                        <div class="position-absolute top-0 start-0 m-3">
+                            <span class="badge badge-discount shadow">-20%</span>
+                        </div>
+                    </div>
+                    <div class="card-body px-4">
+                        <small class="text-uppercase text-muted fw-bold" style="font-size: 0.7rem;">Công nghệ</small>
+                        <h5 class="card-title fw-bold my-2 text-dark">Sản phẩm High-Tech @i</h5>
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                            <div>
+                                <span class="text-primary fw-bold fs-5">@( (i * 1250000).ToString("N0") )đ</span>
+                            </div>
+                            <div class="text-warning">
+                                <i class="fa-solid fa-star small"></i>
+                                <i class="fa-solid fa-star small"></i>
+                                <i class="fa-solid fa-star small"></i>
+                                <i class="fa-solid fa-star small"></i>
+                                <i class="fa-solid fa-star-half-stroke small"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-transparent border-0 pb-4 px-4">
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-modern shadow-sm">
+                                <i class="fa-solid fa-cart-shopping me-2"></i>Thêm vào giỏ
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>

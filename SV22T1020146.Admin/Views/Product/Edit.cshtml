@@ -1,0 +1,152 @@
+﻿@model SV22T1020146.Models.Catalog.Product
+@{
+    ViewBag.Title = Model.ProductID == 0 ? "Bổ sung mặt hàng" : "Cập nhật mặt hàng";
+}
+
+@section PageToolBar {
+    <button type="submit" form="formEdit" class="btn btn-primary">
+        <i class="bi bi-save"></i> Lưu dữ liệu
+    </button>
+    <a href="~/Product" class="btn btn-secondary ms-1">Quay lại</a>
+}
+
+<div class="row justify-content-center">
+    <div class="col-12">
+        <div class="card card-primary card-outline">
+            <div class="card-body">
+                <form id="formEdit" action="~/Product/SaveData" method="post" enctype="multipart/form-data">
+                    @Html.HiddenFor(m => m.ProductID)
+                    @Html.HiddenFor(m => m.Photo)
+
+                    <!-- Tên mặt hàng -->
+                    <div class="row mb-3">
+                        <label class="col-sm-3 col-form-label f-bold">Tên mặt hàng</label>
+                        <div class="col-sm-9">
+                            <input type="text" name="@nameof(Model.ProductName)" value="@Model.ProductName" class="form-control" autofocus />
+                            @Html.ValidationMessageFor(m => m.ProductName, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <!-- Loại hàng & Nhà cung cấp -->
+                    <div class="row mb-3">
+                        <label class="col-sm-3 col-form-label">Loại hàng</label>
+                        <div class="col-sm-3">
+                            <select class="form-select" name="@nameof(Model.CategoryID)">
+                                <option value="0">-- Chọn loại hàng --</option>
+                                @if (ViewBag.Categories != null)
+                                {
+                                    foreach (var item in ViewBag.Categories)
+                                    {
+                                        <option value="@item.CategoryID" selected="@(item.CategoryID == Model.CategoryID)">
+                                            @item.CategoryName
+                                        </option>
+                                    }
+                                }
+                            </select>
+                            @Html.ValidationMessageFor(m => m.CategoryID, "", new { @class = "text-danger" })
+                        </div>
+
+                        <label class="col-sm-2 col-form-label text-end">Nhà cung cấp</label>
+                        <div class="col-sm-4">
+                            <select class="form-select" name="@nameof(Model.SupplierID)">
+                                <option value="0">-- Chọn nhà cung cấp --</option>
+                                @if (ViewBag.Suppliers != null)
+                                {
+                                    foreach (var item in ViewBag.Suppliers)
+                                    {
+                                        <option value="@item.SupplierID" selected="@(item.SupplierID == Model.SupplierID)">
+                                            @item.SupplierName
+                                        </option>
+                                    }
+                                }
+                            </select>
+                            @Html.ValidationMessageFor(m => m.SupplierID, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <!-- Đơn vị & Giá -->
+                    <div class="row mb-3">
+                        <label class="col-sm-3 col-form-label">Đơn vị tính</label>
+                        <div class="col-sm-3">
+                            <input type="text" name="@nameof(Model.Unit)" value="@Model.Unit" class="form-control" />
+                        </div>
+
+                        <label class="col-sm-2 col-form-label text-end">Giá</label>
+                        <div class="col-sm-4">
+                            <input type="text" name="@nameof(Model.Price)" value="@Model.Price.ToString("0")" class="form-control" />
+                            @Html.ValidationMessageFor(m => m.Price, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <!-- Trạng thái -->
+                    <div class="row mb-3">
+                        <label class="col-sm-3 col-form-label">Trạng thái</label>
+                        <div class="col-sm-9 mt-2">
+                            <div class="form-check">
+                                @Html.CheckBoxFor(m => m.IsSelling, new { @class = "form-check-input", @id = "isSellingCheck" })
+                                <label class="form-check-label" for="isSellingCheck">Đang bán</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Ảnh đại diện -->
+                    <div class="row mb-3">
+                        <label class="col-sm-3 col-form-label">Ảnh đại diện</label>
+                        <div class="col-sm-9">
+                            <input type="file" name="uploadPhoto" class="form-control" accept="image/*" onchange="previewImage(this)" />
+
+                            <div class="mt-2 mb-2">
+                                <button type="button" class="btn btn-danger btn-sm" onclick="deletePhoto()">Xóa ảnh</button>
+                            </div>
+
+                            <div class="mt-2 text-center border p-2 bg-light">
+                                <img id="imgPreview" src="~/images/products/@(string.IsNullOrEmpty(Model.Photo) ? "nophoto.png" : Model.Photo)" class="img-fluid rounded" style="max-height: 200px;" />
+                            </div>
+
+                            @Html.HiddenFor(m => m.Photo) @* giữ giá trị Photo để controller nhận *@
+                        </div>
+                    </div>
+
+                   
+                </form>
+            </div>
+        </div>
+
+        @* Danh sách ảnh & thuộc tính (chỉ khi ProductID > 0) *@
+        @if (Model.ProductID > 0)
+        {
+            <div id="listPhotos" class="card card-info card-outline mb-4">
+                <div class="card-header"><h5 class="card-title">Danh sách ảnh</h5></div>
+                <div class="card-body">
+                    @{
+                        var photos = ViewBag.Photos as IEnumerable<SV22T1020146.Models.Catalog.ProductPhoto>;
+                        await Html.RenderPartialAsync("ListPhotos", photos);
+                    }
+                </div>
+            </div>
+
+            <div id="listAttributes" class="card card-info card-outline">
+                <div class="card-header"><h5 class="card-title">Thuộc tính mặt hàng</h5></div>
+                <div class="card-body">
+                    @{
+                        var attributes = ViewBag.Attributes as IEnumerable<SV22T1020146.Models.Catalog.ProductAttribute>;
+                        await Html.RenderPartialAsync("ListAttributes", attributes);
+                    }
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<script>
+    function previewImage(input) {
+        if (input.files && input.files[0]) {
+            document.getElementById('imgPreview').src = window.URL.createObjectURL(input.files[0]);
+        }
+    }
+
+    function deletePhoto() {
+        document.getElementById('imgPreview').src = '@Url.Content("~/images/products/nophoto.png")';
+        document.querySelector('input[name="Photo"]').value = "nophoto.png"; 
+    }
+</script>

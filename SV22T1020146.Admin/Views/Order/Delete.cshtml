@@ -1,0 +1,52 @@
+﻿@model int
+@{
+    Layout = null;
+}
+
+@if (ViewBag.Error != null)
+{
+    <!-- TRƯỜNG HỢP KHÔNG ĐƯỢC XÓA -->
+    <div class="modal-header bg-danger">
+        <h5 class="modal-title">
+            <i class="bi bi-exclamation-triangle"></i> Không thể xóa
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+    </div>
+
+    <div class="modal-body text-center">
+        <div class="alert alert-danger">
+            @ViewBag.Error
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+            Quay lại
+        </button>
+    </div>
+}
+else
+{
+    <!-- TRƯỜNG HỢP ĐƯỢC XÓA -->
+    <form action="~/Order/DeleteConfirm/@Model" method="post">
+        @Html.AntiForgeryToken()
+
+        <div class="modal-header bg-danger text-white">
+            <h5 class="modal-title">
+                <i class="bi bi-trash"></i> Xác nhận xóa
+            </h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+
+        <div class="modal-body text-center">
+            <p>Bạn có chắc chắn muốn xóa đơn hàng <strong>#@Model</strong>?</p>
+        </div>
+
+        <div class="modal-footer">
+            <button type="submit" class="btn btn-danger">Xác nhận xóa</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                Hủy bỏ
+            </button>
+        </div>
+    </form>
+}
