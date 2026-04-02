@@ -26,6 +26,13 @@
                             </div>
                         }
                         <form asp-action="Login" method="post">
+                            @if (!ViewData.ModelState.IsValid)
+                            {
+                                <div class="alert alert-danger rounded-4 mb-4">
+                                    <i class="fa-solid fa-triangle-exclamation me-2"></i>
+                                    @Html.ValidationSummary()
+                                </div>
+                            }
                             <div class="mb-4">
                                 <label class="form-label small fw-bold text-muted ps-3">Tài khoản Email</label>
                                 <div class="input-group-custom d-flex align-items-center">

@@ -21,11 +21,12 @@ namespace SV22T1020146.DataLayers.SQLServer
                                CustomerName AS DisplayName,
                                Email,
                                '' AS Photo,
-                               'customer' AS RoleNames
+                               'customer' AS RoleNames,
+                                IsLocked
                            FROM Customers
                            WHERE Email=@userName 
-                                 AND Password=@password 
-                                 AND IsLocked=0";
+                                 AND Password=@password"; 
+                                 
 
             return await connection.QueryFirstOrDefaultAsync<UserAccount>(
                 sql,

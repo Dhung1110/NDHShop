@@ -95,6 +95,13 @@ namespace SV22T1020146.Shop.Controllers
                 return View(model);
             }
 
+            // 🚫 Tài khoản bị khóa
+            if (user.IsLocked)
+            {
+                ModelState.AddModelError("", "Tài khoản của bạn đã bị khóa. Vui lòng liên hệ quản trị viên.");
+                return View(model);
+            }
+
             var claims = new List<Claim>()
             {
                 new Claim(ClaimTypes.Name, user.DisplayName),

@@ -29,5 +29,7 @@
         /// Danh sách tên các vai trò/quyền của người dùng, được phân cách bởi dấu chấm phẩy (nếu có)
         /// </summary>
         public string RoleNames { get; set; } = "";
+
+        public bool IsLocked { get; set; }
     }
 }
