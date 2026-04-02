@@ -73,16 +73,13 @@ namespace SV22T1020146.Admin.Controllers
                             SearchValue = ""
                         };
 
-            // 👉 dùng helper
             ViewBag.Details = ShoppingCartHelper.GetShoppingCart();
             ViewBag.OrderID = 0;
 
-            // Load khách hàng
             List<Customer> allCustomers = new List<Customer>();
             int page = 1;
             int pageSize = 100;
 
-            // đổi tên biến từ 'input' thành 'pageInput' để không trùng
             PaginationSearchInput pageInput;
 
             while (true)
@@ -101,9 +98,9 @@ namespace SV22T1020146.Admin.Controllers
                 allCustomers.AddRange(result.DataItems);
 
                 if (result.DataItems.Count < pageSize)
-                    break; // hết dữ liệu
+                    break; 
 
-                page++; // sang trang tiếp theo
+                page++; 
             }
 
             ViewBag.Customers = allCustomers;
@@ -280,7 +277,6 @@ namespace SV22T1020146.Admin.Controllers
                 });
             }
 
-            // 3. Dọn giỏ hàng
             ShoppingCartHelper.ClearCart();
             HttpContext.Session.Remove("order_customerID");
             HttpContext.Session.Remove("order_province");
@@ -348,7 +344,6 @@ namespace SV22T1020146.Admin.Controllers
             if (quantity <= 0)
                 return Content("Số lượng không hợp lệ");
 
-            // 🔥 LẤY LẠI GIÁ CŨ
             var oldItem = await SalesDataService.GetDetailAsync(orderId, productId);
             if (oldItem == null)
                 return Content("Không tìm thấy mặt hàng");
@@ -358,7 +353,7 @@ namespace SV22T1020146.Admin.Controllers
                 OrderID = orderId,
                 ProductID = productId,
                 Quantity = quantity,
-                SalePrice = oldItem.SalePrice // ✅ QUAN TRỌNG
+                SalePrice = oldItem.SalePrice 
             });
 
             return RedirectToAction("Detail", new { id = orderId });
@@ -371,7 +366,6 @@ namespace SV22T1020146.Admin.Controllers
         /// <summary>
         /// Hiển thị xác nhận xóa
         /// </summary>
-        [Authorize(Roles = "admin,sales")]
         [HttpGet]
         public async Task<IActionResult> DeleteOrderItem(int orderId, int productId)
         {
@@ -400,7 +394,7 @@ namespace SV22T1020146.Admin.Controllers
         /// </summary>
         [Authorize(Roles = "admin,sales")]
         [HttpPost]
-        [ActionName("DeleteOrderItem")]   // 🔥 QUAN TRỌNG
+        [ActionName("DeleteOrderItem")]   
         public async Task<IActionResult> DeleteOrderItemConfirmed(int orderId, int productId)
         {
             var order = await SalesDataService.GetOrderAsync(orderId);

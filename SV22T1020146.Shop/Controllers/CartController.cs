@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using SV22T1020146.BusinessLayers;
 using SV22T1020146.Models.Sales;
 
 namespace SV22T1020146.Shop.Controllers
 {
+    [Authorize]
     public class CartController : Controller
     {
         /// <summary>

@@ -184,7 +184,7 @@ namespace SV22T1020146.Admin.Controllers
 
             ViewBag.Title = "Đổi mật khẩu khách hàng";
 
-            // 1. Validate rỗng và xác nhận
+            
             if (string.IsNullOrWhiteSpace(password))
                 ModelState.AddModelError("password", "Vui lòng nhập mật khẩu mới");
 
@@ -194,10 +194,10 @@ namespace SV22T1020146.Admin.Controllers
             if (!ModelState.IsValid)
                 return View(customer);
 
-            // 2. Hash và lưu mật khẩu mới
+           
             await PartnerDataService.ChangeCustomerPasswordAsync(customer.Email, CryptHelper.HashMD5(password));
 
-            // 3. Hiển thị thông báo thành công trên cùng trang
+           
             ViewBag.SuccessMessage = "Đã đổi mật khẩu thành công";
 
             return View(customer);

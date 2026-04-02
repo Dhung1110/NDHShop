@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using SV22T1020146.BusinessLayers;
 using SV22T1020146.DataLayers.Interfaces;
 using SV22T1020146.DataLayers.SQLServer;
@@ -7,6 +8,7 @@ using SV22T1020146.Models.Common;
 
 namespace SV22T1020146.Shop.Controllers
 {
+    [Authorize]
     public class ProductController : Controller
     {
         private const int PAGE_SIZE = 12;

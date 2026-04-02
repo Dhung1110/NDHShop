@@ -52,7 +52,9 @@ namespace SV22T1020146.DataLayers.SQLServer
                                Province=@Province,
                                Address=@Address,
                                Phone=@Phone,
-                               Email=@Email
+                               Email=@Email,
+                               IsLocked=@IsLocked
+
                            WHERE CustomerID=@CustomerID";
 
             return await connection.ExecuteAsync(sql, data) > 0;

@@ -14,7 +14,10 @@ namespace SV22T1020146.Admin.Controllers
         {
             return View();
         }
-
+        /// <summary>
+        /// Đăng nhập
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         [AllowAnonymous]
         public IActionResult Login()
@@ -31,8 +34,6 @@ namespace SV22T1020146.Admin.Controllers
                 ModelState.AddModelError("Error", "Vui lòng nhập đủ thông tin");
                 return View();
             }
-
-            // ❗ Nếu DB không hash thì comment dòng này
             password = CryptHelper.HashMD5(password);
 
             var userAccount = await Configuration.SecurityService.AuthorizeAsync(username, password);
@@ -61,8 +62,10 @@ namespace SV22T1020146.Admin.Controllers
             return RedirectToAction("Index", "Home");
         }
 
-        // ================= CHANGE PASSWORD =================
-
+        /// <summary>
+        /// Đổi mật khẩu 
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         public IActionResult ChangePassword()
         {
@@ -88,7 +91,6 @@ namespace SV22T1020146.Admin.Controllers
             if (user == null)
                 return RedirectToAction("Login");
 
-            // ❗ nếu dùng MD5 thì bật lại
              newPassword = CryptHelper.HashMD5(newPassword);
 
             bool result = await Configuration.SecurityService
@@ -103,8 +105,10 @@ namespace SV22T1020146.Admin.Controllers
             ViewBag.Success = "Đổi mật khẩu thành công!";
             return View();
         }
-
-        // ================= LOGOUT =================
+        /// <summary>
+        /// Đăng xuất 
+        /// </summary>
+        /// <returns></returns>
 
         public async Task<IActionResult> Logout()
         {

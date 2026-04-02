@@ -187,8 +187,12 @@ namespace SV22T1020146.Admin.Controllers
 
             return View(model);
         }
+        /// <summary>
+        /// Đổi mật khẩu nhân viên 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [Authorize(Roles = "admin")]
-        // GET: Hiển thị form đổi mật khẩu
         public async Task<IActionResult> ChangePassword(int id)
         {
             var model = await HRDataService.GetEmployeeAsync(id);
@@ -198,7 +202,6 @@ namespace SV22T1020146.Admin.Controllers
             return View(model);
         }
 
-        // POST: Thực hiện đổi mật khẩu (Admin không cần nhập mật khẩu cũ)
         [HttpPost]
         public async Task<IActionResult> ChangePassword(int id, string password, string confirmPassword)
         {
@@ -214,15 +217,15 @@ namespace SV22T1020146.Admin.Controllers
                 ModelState.AddModelError("confirmPassword", "Mật khẩu xác nhận không khớp");
 
             if (!ModelState.IsValid)
-                return View(employee); // vẫn ở lại trang nếu có lỗi
+                return View(employee); 
 
-            // Hash và lưu mật khẩu mới
+            
             await HRDataService.ChangeEmployeePasswordAsync(employee.Email, CryptHelper.HashMD5(password));
 
-            // Hiển thị thông báo thành công trên cùng trang
+            
             ViewBag.SuccessMessage = "Đã đổi mật khẩu thành công";
 
-            // Trả về model để view vẫn hiển thị thông tin nhân viên
+            
             return View(employee);
         }
 
@@ -238,10 +241,7 @@ namespace SV22T1020146.Admin.Controllers
             if (employee == null)
                 return RedirectToAction("Index");
 
-            // Lấy danh sách role hiện tại
-            var currentRoles = (employee.RoleNames ?? "").Split(',', StringSplitOptions.RemoveEmptyEntries).ToList();
-
-            // Danh sách role toàn bộ
+            var currentRoles = (employee.RoleNames ?? "").Split(',', StringSplitOptions.RemoveEmptyEntries).ToList();            
             ViewBag.AllRoles = new List<string> { WebUserRoles.Administrator, WebUserRoles.DataManager, WebUserRoles.Sales };
             ViewBag.CurrentRoles = currentRoles;
 
@@ -259,7 +259,6 @@ namespace SV22T1020146.Admin.Controllers
 
             ViewBag.SuccessMessage = "Đã cập nhật role thành công";
 
-            // Cập nhật lại danh sách role
             ViewBag.AllRoles = new List<string> { WebUserRoles.Administrator, WebUserRoles.DataManager, WebUserRoles.Sales };
             ViewBag.CurrentRoles = roles;
 
