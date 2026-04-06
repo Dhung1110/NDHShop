@@ -188,15 +188,46 @@ namespace SV22T1020146.Admin.Controllers
 
             bool result;
 
+            
             if (data.ProductID == 0)
             {
+                
                 var newId = await CatalogDataService.AddProductAsync(data);
                 result = newId > 0;
+
+                // ✅ Sau khi thêm: set session search theo tên vừa thêm → Index sẽ tự hiển thị
+                var input = new ProductSearchInput()
+                {
+                    Page = 1,
+                    PageSize = PAGE_SIZE,
+                    SearchValue = data.ProductName,
+                    CategoryID = 0,
+                    SupplierID = 0,
+                    MinPrice = 0,
+                    MaxPrice = 0
+                };
+                ApplicationContext.SetSessionData(SEARCH_PRODUCT, input);
             }
             else
             {
+                
                 result = await CatalogDataService.UpdateProductAsync(data);
+
+                // ✅ Sau khi sửa: set session search theo tên vừa sửa → Index sẽ tự hiển thị
+                var input = new ProductSearchInput()
+                {
+                    Page = 1,
+                    PageSize = PAGE_SIZE,
+                    SearchValue = data.ProductName,
+                    CategoryID = 0,
+                    SupplierID = 0,
+                    MinPrice = 0,
+                    MaxPrice = 0
+                };
+                ApplicationContext.SetSessionData(SEARCH_PRODUCT, input);
             }
+
+            
 
             if (!result)
             {
