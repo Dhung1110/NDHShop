@@ -17,16 +17,17 @@ namespace SV22T1020146.DataLayers.SQLServer
             using var connection = GetConnection();
 
             string sql = @"SELECT 
-                       EmployeeID AS UserId,
-                       Email AS UserName,
-                       FullName AS DisplayName,
-                       Email,
-                       Photo,
-                       RoleNames
-                   FROM Employees
-                   WHERE Email=@userName
-                         AND Password=@password
-                         AND IsWorking=1";
+                   EmployeeID AS UserId,
+                   Email AS UserName,
+                   FullName AS DisplayName,
+                   Email,
+                   Photo,
+                   RoleNames,
+                   IsWorking   
+               FROM Employees
+               WHERE Email=@userName
+                     AND Password=@password";
+
 
             var user = await connection.QueryFirstOrDefaultAsync<UserAccount>(
                 sql,

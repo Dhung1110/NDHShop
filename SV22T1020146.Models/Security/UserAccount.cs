@@ -31,5 +31,7 @@
         public string RoleNames { get; set; } = "";
 
         public bool IsLocked { get; set; }
+
+        public bool IsWorking { get; set; }   
     }
 }

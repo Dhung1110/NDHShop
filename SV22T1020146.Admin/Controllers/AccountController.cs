@@ -44,6 +44,13 @@ namespace SV22T1020146.Admin.Controllers
                 return View();
             }
 
+            // 🚫 check nghỉ việc
+            if (!userAccount.IsWorking)
+            {
+                ModelState.AddModelError("Error", "Tài khoản đã nghỉ việc, không thể đăng nhập");
+                return View();
+            }
+
             var webUserData = new WebUserData()
             {
                 UserId = userAccount.UserId,
