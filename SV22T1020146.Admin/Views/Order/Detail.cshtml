@@ -25,7 +25,9 @@
 
 @section PageToolBar {
     <div class="btn-group">
-        @if (Model.Status == OrderStatusEnum.Cancelled || Model.Status == OrderStatusEnum.Rejected)
+        @if (Model.Status == OrderStatusEnum.Cancelled
+            || Model.Status == OrderStatusEnum.Rejected
+            || Model.Status == OrderStatusEnum.Completed)
         {
             <button class="btn btn-secondary dropdown-toggle" disabled>
                 <i class="bi bi-check-circle"></i> Đã xử lý
@@ -321,9 +323,13 @@
                             <label class="form-label">Người giao hàng</label>
                             <select name="shipperId" class="form-select" required>
                                 <option value="">-- Chọn người giao hàng ---</option>
-                                <option value="1">Giao hàng Tiết kiệm</option>
-                                <option value="2">Tín Thành</option>
-                                <option value="3">Viettel Express</option>
+
+                                @foreach (var shipper in ViewBag.Shippers)
+                                {
+                                    <option value="@shipper.ShipperID">
+                                        @shipper.ShipperName
+                                    </option>
+                                }
                             </select>
                         </div>
                     </div>

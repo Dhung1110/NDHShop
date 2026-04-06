@@ -426,6 +426,17 @@ namespace SV22T1020146.Admin.Controllers
             if (order == null)
                 return RedirectToAction("Index");
 
+            // 🔥 THÊM: LẤY DANH SÁCH SHIPPER
+            var shippers = await PartnerDataService.ListShippersAsync(
+                new PaginationSearchInput()
+                {
+                    Page = 1,
+                    PageSize = 1000,
+                    SearchValue = ""
+                });
+
+            ViewBag.Shippers = shippers.DataItems;
+
             // LẤY CUSTOMER
             if (order.CustomerID.HasValue)
             {
@@ -481,6 +492,24 @@ namespace SV22T1020146.Admin.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [Authorize(Roles = "admin,sales")]
+        [HttpGet]
+        public async Task<IActionResult> Shipping(int id)
+        {
+            ViewBag.OrderID = id;
+
+            // Lấy danh sách shipper từ DB
+            var shippers = await PartnerDataService.ListShippersAsync(
+                new PaginationSearchInput()
+                {
+                    Page = 1,
+                    PageSize = 1000,
+                    SearchValue = ""
+                });
+
+            ViewBag.Shippers = shippers.DataItems;
+
+            return PartialView();
+        }
         [HttpPost]  // Phải POST để cập nhật DB
         public async Task<IActionResult> Shipping(int id, int shipperId)
         {

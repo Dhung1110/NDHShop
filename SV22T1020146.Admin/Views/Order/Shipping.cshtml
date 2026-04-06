@@ -2,7 +2,7 @@
     Layout = null;
 }
 
-<form method="post" action="~/Order/Shipping/@ViewBag.OrderID">
+<form method="post" action="~/Order/Shipping">
     <!-- Chuyển sang POST -->
 
     <div class="modal-header text-bg-info">
@@ -22,9 +22,13 @@
 
                 <select name="shipperId" class="form-select">
                     <option value="0">-- Chọn người giao hàng ---</option>
-                    <option value="1">Giao hàng Tiết kiệm</option>
-                    <option value="2">Tín Thành</option>
-                    <option value="3">Viettel Express</option>
+
+                    @foreach (var shipper in ViewBag.Shippers)
+                    {
+                        <option value="@shipper.ShipperID">
+                            @shipper.ShipperName
+                        </option>
+                    }
                 </select>
             </div>
         </div>
