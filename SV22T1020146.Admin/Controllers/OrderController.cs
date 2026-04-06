@@ -394,23 +394,28 @@ namespace SV22T1020146.Admin.Controllers
         /// </summary>
         [Authorize(Roles = "admin,sales")]
         [HttpPost]
-        [ActionName("DeleteOrderItem")]   
+        [ActionName("DeleteOrderItem")]
         public async Task<IActionResult> DeleteOrderItemConfirmed(int orderId, int productId)
         {
             var order = await SalesDataService.GetOrderAsync(orderId);
             if (order == null)
-                return Content("Đơn hàng không tồn tại");
+                return Json(new { success = false, message = "Đơn hàng không tồn tại" });
 
-            // ✅ CHECK TRẠNG THÁI
-            if (order.Status != OrderStatusEnum.New &&
-                order.Status != OrderStatusEnum.Accepted)
+            if (order.Status != OrderStatusEnum.New)
             {
-                return Content("Không được phép xóa");
+                return Json(new { success = false, message = "Chỉ được xóa khi đơn hàng chờ duyệt!" });
+            }
+
+            var details = await SalesDataService.ListDetailsAsync(orderId);
+
+            if (details.Count <= 1)
+            {
+                return Json(new { success = false, message = "Không thể xóa mặt hàng cuối cùng!" });
             }
 
             await SalesDataService.DeleteDetailAsync(orderId, productId);
 
-            return RedirectToAction("Detail", new { id = orderId });
+            return Json(new { success = true });
         }
 
         #endregion
